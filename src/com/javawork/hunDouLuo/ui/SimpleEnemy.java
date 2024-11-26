@@ -20,6 +20,7 @@
    public int state = 0;
    public Weapon weapon;
    public int type = 0;
+   public boolean isShottedByHero = false;
  
    int temp = 0;
  
@@ -178,6 +179,7 @@
    {
      this.life -= damage;
      if (this.life <= 0)
+       isShottedByHero = true;
        this.state = 4;
    }
  

@@ -1,6 +1,11 @@
  package com.javawork.hunDouLuo.ui;
  
 // import sun.audio.AudioPlayer;
+
+import com.javawork.hunDouLuo.ui.fx.LoginApp;
+import com.javawork.hunDouLuo.ui.fx.gameEndfx;
+import javafx.application.Application;
+
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -8,8 +13,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import javax.sound.sampled.Clip;
- 
+
  public class MainFrame extends Frame
    implements Runnable
  {
@@ -38,7 +42,7 @@ import javax.sound.sampled.Clip;
    private boolean upDown = false;
    private boolean downDown = false;
    private boolean jumpDown = false;
-   private int heroNum = 30;
+   private int heroNum = 1;
    private List<SimpleEnemy> enemys = new ArrayList();
    private boolean showBossScene = false;
    private Boss boss;
@@ -63,9 +67,15 @@ import javax.sound.sampled.Clip;
    private boolean passedSecondMovingGrassLand = false;
  
    boolean stopBossBgSound = true;
+
+   int score = 0;
+   private volatile boolean running = true; // 标志位
+
+
  
    public MainFrame()
    {
+     gameStartfx();
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
      new Thread(this.gameStartBgSoundThread).start();
      this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
@@ -329,13 +339,15 @@ import javax.sound.sampled.Clip;
  
    public void run()
    {
+
      try {
        Thread.sleep(2000L);
      } catch (InterruptedException e) {
        e.printStackTrace();
      }
      setVisible(true);
-     while (true) {
+
+     while (running) {
        repaint(0, 0, 720, this.backgroundSizeOfHeight);
        try {
          Thread.sleep(1000 / FPS);
@@ -357,6 +369,12 @@ import javax.sound.sampled.Clip;
        if ((this.hero.state == 5) && (this.heroNum > 0)) {
          heroBirth();
        }
+       if(this.heroNum==0){
+         running = false;
+         gameEnd(score);
+         break;
+
+       }
        if ((this.hero.position.x > 3260.0F) && (this.mapPosition < 3328.0F) && (this.playPreBossStoneSound)) {
          this.showBossScene = true;
          this.playPreBossStoneSound = false;
@@ -369,7 +387,34 @@ import javax.sound.sampled.Clip;
          playPreBossBattle(this.big);
      }
    }
- 
+
+   private void gameStartfx() {
+
+
+     new Thread(() -> Application.launch(LoginApp.class)).start();
+     while (LoginApp.getPrimaryStage() == null) {
+       try {
+         Thread.sleep(100); // 等待100毫秒
+       } catch (InterruptedException e) {
+         e.printStackTrace();
+       }
+     }
+
+
+
+
+
+     LoginApp.showUI();
+     // 等待登录成功
+     while (!LoginApp.loginSuccessful) {
+       try {
+         Thread.sleep(100); // 等待100毫秒
+       } catch (InterruptedException e) {
+         e.printStackTrace();
+       }
+     }
+   }
+
    private void enemyShotControl()
    {
      for (int i = 0; i < this.enemys.size(); i++)
@@ -937,6 +982,9 @@ import javax.sound.sampled.Clip;
          if (e.touchHeroBulletCheck(b)) {
            if ((e.state == 4) || (e.state == 5)) break;
            e.beShotted(b.energy);
+           if(e.isShottedByHero){
+             score++;
+           }
            this.heroBullets.remove(j);
  
            break;
@@ -1235,6 +1283,26 @@ import javax.sound.sampled.Clip;
          this.hero.position.x = (this.backgroundSizeOfWidth / 6.0F + this.mapPosition);
        }
    }
+
+   private void gameEnd(int score){
+     gameStartBgSoundThread.stopBackgroundMusic();
+
+     new Thread(() -> Application.launch(gameEndfx.class)).start();
+     while (gameEndfx.getPrimaryStage() == null) {
+       try {
+         Thread.sleep(100); // 等待100毫秒
+       } catch (InterruptedException e) {
+         e.printStackTrace();
+       }
+     }
+
+
+
+
+
+      gameEndfx.showUI(score);
+   }
+
  
    public static void main(String[] args) {
      new Thread(new MainFrame()).start();
