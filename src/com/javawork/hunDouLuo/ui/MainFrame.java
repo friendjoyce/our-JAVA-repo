@@ -2,14 +2,16 @@
  
 // import sun.audio.AudioPlayer;
 
-import com.javawork.hunDouLuo.ui.fx.LoginApp;
-import com.javawork.hunDouLuo.ui.fx.gameEndfx;
+import com.javawork.hunDouLuo.ui.App;
 import javafx.application.Application;
+import javafx.application.Platform;
+import sqlOper.Manager;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -68,14 +70,16 @@ import java.util.Random;
  
    boolean stopBossBgSound = true;
 
-   int score = 0;
+   static int score = 0;
    private volatile boolean running = true; // 标志位
+   public static String username;
 
 
  
    public MainFrame()
    {
-     gameStartfx();
+
+
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
      new Thread(this.gameStartBgSoundThread).start();
      this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
@@ -370,10 +374,9 @@ import java.util.Random;
          heroBirth();
        }
        if(this.heroNum==0){
-         running = false;
-         gameEnd(score);
-         break;
 
+
+         running = false;
        }
        if ((this.hero.position.x > 3260.0F) && (this.mapPosition < 3328.0F) && (this.playPreBossStoneSound)) {
          this.showBossScene = true;
@@ -386,34 +389,13 @@ import java.util.Random;
        if (this.preBossBattle)
          playPreBossBattle(this.big);
      }
+     gameStartBgSoundThread.stopBackgroundMusic();
+
+     dispose();
+
    }
 
-   private void gameStartfx() {
 
-
-     new Thread(() -> Application.launch(LoginApp.class)).start();
-     while (LoginApp.getPrimaryStage() == null) {
-       try {
-         Thread.sleep(100); // 等待100毫秒
-       } catch (InterruptedException e) {
-         e.printStackTrace();
-       }
-     }
-
-
-
-
-
-     LoginApp.showUI();
-     // 等待登录成功
-     while (!LoginApp.loginSuccessful) {
-       try {
-         Thread.sleep(100); // 等待100毫秒
-       } catch (InterruptedException e) {
-         e.printStackTrace();
-       }
-     }
-   }
 
    private void enemyShotControl()
    {
@@ -1284,28 +1266,27 @@ import java.util.Random;
        }
    }
 
-   private void gameEnd(int score){
-     gameStartBgSoundThread.stopBackgroundMusic();
 
-     new Thread(() -> Application.launch(gameEndfx.class)).start();
-     while (gameEndfx.getPrimaryStage() == null) {
-       try {
-         Thread.sleep(100); // 等待100毫秒
-       } catch (InterruptedException e) {
-         e.printStackTrace();
-       }
-     }
-
-
-
-
-
-      gameEndfx.showUI(score);
-   }
 
  
    public static void main(String[] args) {
-     new Thread(new MainFrame()).start();
+     Platform.setImplicitExit(false);
+     username = App.gameStartfx();
+     Thread game = new Thread(new MainFrame());
+     game.start();
+     try {
+       game.join();
+     } catch (InterruptedException e) {
+       e.printStackTrace();
+     }
+
+     try {
+       App.gameEnd(username,score);
+     } catch (SQLException e) {
+       e.printStackTrace();
+       throw new RuntimeException(e);
+     }
+    return;
    }
  }
 

@@ -1,4 +1,4 @@
-package com.javawork.hunDouLuo.ui.fx;
+package com.javawork.hunDouLuo.ui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,25 +10,36 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import sqlOper.Manager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.SQLException;
 
-public class LoginApp extends Application {
+public class App extends Application {
 
     private static Stage primaryStage;
+    private static Stage gameEndStage;
     public static boolean loginSuccessful = false;
-    private static Map<String, String> userDatabase = new HashMap<>();
+    private static String password;
+    private static String username;
+
+    public static String getUsername() {
+        return username;
+    }
 
     @Override
     public void start(Stage primaryStage) {
-        LoginApp.primaryStage = primaryStage;
+        App.primaryStage = primaryStage;
         primaryStage.setTitle("登录界面");
+        showLoginUI();
 
+        // 创建第二个窗口，但不显示
+        gameEndStage = new Stage();
+        gameEndStage.setTitle("Game Over");
     }
 
-    public static void showUI() {
+    public static void showLoginUI() {
         Platform.runLater(() -> {
             // 创建用户名标签和输入框
             Label usernameLabel = new Label("用户名:");
@@ -41,9 +52,13 @@ public class LoginApp extends Application {
             // 创建登录按钮
             Button loginButton = new Button("登录");
             loginButton.setOnAction(e -> {
-                String username = usernameField.getText();
-                String password = passwordField.getText();
-                handleLogin(username, password);
+                username = usernameField.getText();
+                password = passwordField.getText();
+                try {
+                    handleLogin(username, password);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             });
 
             // 创建注册按钮
@@ -81,9 +96,13 @@ public class LoginApp extends Application {
             // 创建注册按钮
             Button registerButton = new Button("注册");
             registerButton.setOnAction(e -> {
-                String username = usernameField.getText();
-                String password = passwordField.getText();
-                handleRegister(username, password);
+                username = usernameField.getText();
+                password = passwordField.getText();
+                try {
+                    handleRegister(username, password);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             });
 
             // 创建布局并添加控件
@@ -103,16 +122,18 @@ public class LoginApp extends Application {
         });
     }
 
-    private static void handleLogin(String username, String password) {
+    private static void handleLogin(String username, String password) throws SQLException {
         // 处理登录逻辑
-        if (userDatabase.containsKey(username) && userDatabase.get(username).equals(password)) {
+        Manager sqlManager = new Manager();
+        boolean findflag = sqlManager.userfind(username, password);
+        if (findflag) {
             loginSuccessful = true;
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("登录成功");
             alert.setHeaderText(null);
             alert.setContentText("欢迎, " + username + "!");
             alert.showAndWait();
-            primaryStage.close();
+            primaryStage.hide();
         } else {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("登录失败");
@@ -122,30 +143,65 @@ public class LoginApp extends Application {
         }
     }
 
-    private static void handleRegister(String username, String password) {
+    private static void handleRegister(String username, String password) throws SQLException {
         // 处理注册逻辑
-        if (userDatabase.containsKey(username)) {
+        Manager sqlManager = new Manager();
+        if (sqlManager.userfind(username)) {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("注册失败");
             alert.setHeaderText(null);
             alert.setContentText("用户名已存在，请选择其他用户名。");
             alert.showAndWait();
         } else {
-            userDatabase.put(username, password);
+            sqlManager.userinsert(username, password, 0);
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("注册成功");
             alert.setHeaderText(null);
             alert.setContentText("注册成功，请登录。");
             alert.showAndWait();
-            showUI();
+            showLoginUI();
         }
+    }
+
+    public static void showGameEndUI(String username, int score, int state) {
+        Platform.runLater(() -> {
+
+            Label label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score);
+
+            if (state == 3) {
+                label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score + "\ndidn't break your best \n need more effort!!!!!!!!!!!!!!!");
+            }
+            if (state == 1) {
+                label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score + "\ncongratulation! your personal best born!");
+            }
+
+
+            label.setStyle("-fx-font-size:24;-fx-text-fill:rgb(178,34,34);");
+            StackPane root = new StackPane();
+            root.getChildren().add(label);
+
+            Scene scene = new Scene(root, 400, 300);
+            gameEndStage.setScene(scene);
+            gameEndStage.show();
+        });
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
+
+    public static Stage getGameEndStage() {
+        return gameEndStage;
     }
 
     public static void main(String[] args) {
         launch(args);
+    }
 
-        // 等待登录成功
-        while (!loginSuccessful) {
+    // 定义 gameStartfx 方法
+    public static String gameStartfx() {
+        new Thread(() -> Application.launch(App.class)).start();
+        while (App.getPrimaryStage() == null) {
             try {
                 Thread.sleep(100); // 等待100毫秒
             } catch (InterruptedException e) {
@@ -153,11 +209,30 @@ public class LoginApp extends Application {
             }
         }
 
-        // 登录成功后继续执行下一步操作
-        System.out.println("登录成功，继续执行下一步操作...");
+        Platform.runLater(() -> App.showLoginUI());
+        // 等待登录成功
+        while (!App.loginSuccessful) {
+            try {
+                Thread.sleep(100); // 等待100毫秒
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return App.getUsername();
     }
 
-    public static Stage getPrimaryStage() {
-        return primaryStage;
+    // 定义 gameEnd 方法
+    public static void gameEnd(String username, int score) throws SQLException {
+
+
+        Manager sqlmanager = new Manager();
+        int stateofupdate = sqlmanager.userUpdateScore(username, score);
+
+
+
+
+            App.showGameEndUI(username, score, stateofupdate); // 示例参数
+
     }
 }
