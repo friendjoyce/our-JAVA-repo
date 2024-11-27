@@ -1270,6 +1270,7 @@ import java.util.Random;
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
+
      Platform.setImplicitExit(false);
      username = App.gameStartfx();
      Thread game = new Thread(new MainFrame());

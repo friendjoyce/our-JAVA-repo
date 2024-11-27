@@ -2,6 +2,9 @@ package com.javawork.hunDouLuo.ui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -9,11 +12,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import sqlOperator.Manager;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 public class App extends Application {
@@ -49,11 +56,14 @@ public class App extends Application {
             Label passwordLabel = new Label("密码:");
             PasswordField passwordField = new PasswordField();
 
-            // 创建登录按钮
-            Button loginButton = new Button("登录");
+            Button loginButton = new Button();
+            loginButton.getStyleClass().add("button");
+
+            loginButton.setText("登录");
+
             loginButton.setOnAction(e -> {
                 username = usernameField.getText();
-                password = passwordField.getText();
+                String password = passwordField.getText();
                 try {
                     handleLogin(username, password);
                 } catch (SQLException ex) {
@@ -61,23 +71,46 @@ public class App extends Application {
                 }
             });
 
-            // 创建注册按钮
-            Button registerButton = new Button("注册");
+            Button registerButton = new Button();
+            registerButton.getStyleClass().add("button");
+
+            registerButton.setText("注册");
+
             registerButton.setOnAction(e -> showRegisterUI());
 
             // 创建布局并添加控件
             GridPane gridPane = new GridPane();
             gridPane.setHgap(10);
             gridPane.setVgap(10);
+            gridPane.setAlignment(Pos.CENTER);
             gridPane.add(usernameLabel, 0, 0);
-            gridPane.add(usernameField, 1, 0);
-            gridPane.add(passwordLabel, 0, 1);
-            gridPane.add(passwordField, 1, 1);
-            gridPane.add(loginButton, 1, 2);
-            gridPane.add(registerButton, 1, 3);
+            gridPane.add(usernameField, 0, 1);
+            gridPane.add(passwordLabel, 0, 2);
+            gridPane.add(passwordField, 0, 3);
+            gridPane.add(loginButton, 0, 4);
+            gridPane.add(registerButton, 0, 5);
+
+            GridPane.setValignment(usernameLabel, VPos.CENTER);
+            GridPane.setHalignment(usernameLabel, HPos.CENTER);
+            GridPane.setHalignment(usernameField, HPos.CENTER);
+            GridPane.setValignment(usernameField, VPos.CENTER);
+            GridPane.setHalignment(passwordLabel, HPos.CENTER);
+            GridPane.setValignment(passwordLabel, VPos.CENTER);
+            GridPane.setHalignment(passwordField, HPos.CENTER);
+            GridPane.setValignment(passwordField, VPos.CENTER);
+            GridPane.setHalignment(loginButton, HPos.CENTER);
+            GridPane.setValignment(loginButton, VPos.CENTER);
+            GridPane.setHalignment(registerButton, HPos.CENTER);
+            GridPane.setValignment(registerButton, VPos.CENTER);
+
+            // 创建 StackPane 并将 GridPane 添加到其中
+            StackPane stackPane = new StackPane(gridPane);
+            stackPane.setAlignment(Pos.CENTER);
 
             // 创建场景并设置到舞台
-            Scene scene = new Scene(gridPane, 300, 200);
+            Scene scene = new Scene(stackPane, 300, 200);
+            scene.getStylesheets().add(App.class.getResource("/style/button.css").toExternalForm());
+
             primaryStage.setScene(scene);
             primaryStage.show();
         });
@@ -93,11 +126,17 @@ public class App extends Application {
             Label passwordLabel = new Label("密码:");
             PasswordField passwordField = new PasswordField();
 
-            // 创建注册按钮
-            Button registerButton = new Button("注册");
+            Button registerButton = new Button();
+            registerButton.getStyleClass().add("button");
+
+            registerButton.setText("注册");
+
+
+
+
             registerButton.setOnAction(e -> {
-                username = usernameField.getText();
-                password = passwordField.getText();
+                String username = usernameField.getText();
+                String password = passwordField.getText();
                 try {
                     handleRegister(username, password);
                 } catch (SQLException ex) {
@@ -109,14 +148,32 @@ public class App extends Application {
             GridPane gridPane = new GridPane();
             gridPane.setHgap(10);
             gridPane.setVgap(10);
+            gridPane.setAlignment(Pos.CENTER);
             gridPane.add(usernameLabel, 0, 0);
-            gridPane.add(usernameField, 1, 0);
-            gridPane.add(passwordLabel, 0, 1);
-            gridPane.add(passwordField, 1, 1);
-            gridPane.add(registerButton, 1, 2);
+            gridPane.add(usernameField, 0, 1);
+            gridPane.add(passwordLabel, 0, 2);
+            gridPane.add(passwordField, 0, 3);
+
+            gridPane.add(registerButton, 0, 4);
+
+            GridPane.setValignment(usernameLabel, VPos.CENTER);
+            GridPane.setHalignment(usernameField, HPos.CENTER);
+            GridPane.setValignment(usernameField, VPos.CENTER);
+            GridPane.setHalignment(passwordLabel, HPos.CENTER);
+            GridPane.setValignment(passwordLabel, VPos.CENTER);
+            GridPane.setHalignment(passwordField, HPos.CENTER);
+            GridPane.setValignment(passwordField, VPos.CENTER);
+
+            GridPane.setHalignment(registerButton, HPos.CENTER);
+            GridPane.setValignment(registerButton, VPos.CENTER);
+
+
+            StackPane stackPane = new StackPane(gridPane);
+            stackPane.setAlignment(Pos.CENTER);
 
             // 创建场景并设置到舞台
-            Scene scene = new Scene(gridPane, 300, 200);
+            Scene scene = new Scene(stackPane, 300, 200);
+            scene.getStylesheets().add(App.class.getResource("/style/button.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.show();
         });
@@ -176,7 +233,7 @@ public class App extends Application {
             }
 
 
-            label.setStyle("-fx-font-size:24;-fx-text-fill:rgb(178,34,34);");
+            label.setStyle("-fx-font-size:24;-fx-text-fill:rgb(34,158,241);");
             StackPane root = new StackPane();
             root.getChildren().add(label);
 
