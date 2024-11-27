@@ -1,0 +1,56 @@
+@font-face {
+    -fx-font-family: 'Championship';
+    -fx-font-style: normal;
+    -fx-font-weight: normal;
+    src: url('../../font/Championship.ttf');
+}
+
+
+.button {
+    -fx-background-image: url("../../graphics/someui/button.png");
+    -fx-background-size: 190% 190%;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-border-width:0;
+    -fx-padding: 0;
+    -fx-font-family: 'Championship';
+    -fx-font-size: 20px;
+    -fx-text-fill: rgb(128, 87, 0);
+}
+
+
+.label1 {
+    -fx-opacity: 0.89;
+    -fx-alignment: center;
+    -fx-font-family: "Championship";
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-image: url("../../graphics/someui/button.png");
+    -fx-background-size: 120% 120%;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-border-width:0;
+    -fx-padding: 0;
+    -fx-text-fill: rgb(128, 87, 0);
+
+
+}
+
+
+
+.field1{
+    -fx-opacity: 0.5;
+}
+
+.root{
+    -fx-background-image: url("../../graphics/someui/title.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-border-width:0;
+    -fx-padding: 0;
+    -fx-background-size: 100% 100%;
+
+
+}
+
+

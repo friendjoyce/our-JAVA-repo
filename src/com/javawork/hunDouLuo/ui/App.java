@@ -12,15 +12,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import sqlOperator.Manager;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 public class App extends Application {
@@ -39,6 +37,7 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         App.primaryStage = primaryStage;
         primaryStage.setTitle("登录界面");
+        primaryStage.setResizable(false);
         showLoginUI();
 
         // 创建第二个窗口，但不显示
@@ -48,18 +47,24 @@ public class App extends Application {
 
     public static void showLoginUI() {
         Platform.runLater(() -> {
-            // 创建用户名标签和输入框
-            Label usernameLabel = new Label("用户名:");
+
+//            Label titleLabel = new Label("全球排名！\n 梦回经典--魂斗罗");
+//            titleLabel.getStyleClass().add("title1");
+//            titleLabel.setText("全球排名！\n 梦回经典--魂斗罗");
+            // 创建username标签和输入框
+            Label usernameLabel = new Label("USERNAME:");
+            usernameLabel.getStyleClass().add("label1");
             TextField usernameField = new TextField();
+            usernameField.getStyleClass().add("field1");
 
             // 创建密码标签和输入框
-            Label passwordLabel = new Label("密码:");
+            Label passwordLabel = new Label("PASSWORD:");
+            passwordLabel.getStyleClass().add("label1");
             PasswordField passwordField = new PasswordField();
-
+            passwordField.getStyleClass().add("field1");
             Button loginButton = new Button();
             loginButton.getStyleClass().add("button");
-
-            loginButton.setText("登录");
+            loginButton.setText("LOGIN");
 
             loginButton.setOnAction(e -> {
                 username = usernameField.getText();
@@ -74,42 +79,43 @@ public class App extends Application {
             Button registerButton = new Button();
             registerButton.getStyleClass().add("button");
 
-            registerButton.setText("注册");
+            registerButton.setText("ENROLL");
 
             registerButton.setOnAction(e -> showRegisterUI());
 
             // 创建布局并添加控件
-            GridPane gridPane = new GridPane();
-            gridPane.setHgap(10);
-            gridPane.setVgap(10);
-            gridPane.setAlignment(Pos.CENTER);
-            gridPane.add(usernameLabel, 0, 0);
-            gridPane.add(usernameField, 0, 1);
-            gridPane.add(passwordLabel, 0, 2);
-            gridPane.add(passwordField, 0, 3);
-            gridPane.add(loginButton, 0, 4);
-            gridPane.add(registerButton, 0, 5);
+            AnchorPane anchorPane = new AnchorPane();
 
-            GridPane.setValignment(usernameLabel, VPos.CENTER);
-            GridPane.setHalignment(usernameLabel, HPos.CENTER);
-            GridPane.setHalignment(usernameField, HPos.CENTER);
-            GridPane.setValignment(usernameField, VPos.CENTER);
-            GridPane.setHalignment(passwordLabel, HPos.CENTER);
-            GridPane.setValignment(passwordLabel, VPos.CENTER);
-            GridPane.setHalignment(passwordField, HPos.CENTER);
-            GridPane.setValignment(passwordField, VPos.CENTER);
-            GridPane.setHalignment(loginButton, HPos.CENTER);
-            GridPane.setValignment(loginButton, VPos.CENTER);
-            GridPane.setHalignment(registerButton, HPos.CENTER);
-            GridPane.setValignment(registerButton, VPos.CENTER);
+            // 添加控件到 AnchorPane 并设置位置
+            AnchorPane.setTopAnchor(usernameLabel, 315.0);
+            AnchorPane.setLeftAnchor(usernameLabel, 200.0);
+            AnchorPane.setRightAnchor(usernameLabel, 200.0);
 
-            // 创建 StackPane 并将 GridPane 添加到其中
-            StackPane stackPane = new StackPane(gridPane);
-            stackPane.setAlignment(Pos.CENTER);
+            AnchorPane.setTopAnchor(usernameField, 340.0);
+            AnchorPane.setLeftAnchor(usernameField, 200.0);
+            AnchorPane.setRightAnchor(usernameField, 200.0);
+
+            AnchorPane.setTopAnchor(passwordLabel, 385.0);
+            AnchorPane.setLeftAnchor(passwordLabel, 200.0);
+            AnchorPane.setRightAnchor(passwordLabel, 200.0);
+
+            AnchorPane.setTopAnchor(passwordField, 410.0);
+            AnchorPane.setLeftAnchor(passwordField, 200.0);
+            AnchorPane.setRightAnchor(passwordField, 200.0);
+
+            AnchorPane.setTopAnchor(loginButton, 450.0);
+            AnchorPane.setLeftAnchor(loginButton, 200.0);
+            AnchorPane.setRightAnchor(loginButton, 200.0);
+
+            AnchorPane.setTopAnchor(registerButton, 490.0);
+            AnchorPane.setLeftAnchor(registerButton, 200.0);
+            AnchorPane.setRightAnchor(registerButton, 200.0);
+
+            anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, loginButton, registerButton);
 
             // 创建场景并设置到舞台
-            Scene scene = new Scene(stackPane, 300, 200);
-            scene.getStylesheets().add(App.class.getResource("/style/button.css").toExternalForm());
+            Scene scene = new Scene(anchorPane, 500, 600);
+            scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
 
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -118,18 +124,25 @@ public class App extends Application {
 
     public static void showRegisterUI() {
         Platform.runLater(() -> {
-            // 创建用户名标签和输入框
-            Label usernameLabel = new Label("用户名:");
+            // 创建username标签和输入框
+
+//            Label titleLabel = new Label("全球排名！\n 梦回经典--魂斗罗");
+//            titleLabel.getStyleClass().add("title1");
+//            titleLabel.setText("全球排名！\n 梦回经典--魂斗罗");
+            Label usernameLabel = new Label("USERNAME:");
+            usernameLabel.getStyleClass().add("label1");
             TextField usernameField = new TextField();
-
+            usernameField.getStyleClass().add("field1");
             // 创建密码标签和输入框
-            Label passwordLabel = new Label("密码:");
-            PasswordField passwordField = new PasswordField();
+            Label passwordLabel = new Label("PASSWORD:");
+            passwordLabel.getStyleClass().add("label1");
 
+            PasswordField passwordField = new PasswordField();
+            passwordField.getStyleClass().add("field1");
             Button registerButton = new Button();
             registerButton.getStyleClass().add("button");
 
-            registerButton.setText("注册");
+            registerButton.setText("ENROLL");
 
 
 
@@ -144,36 +157,35 @@ public class App extends Application {
                 }
             });
 
+            AnchorPane anchorPane = new AnchorPane();
             // 创建布局并添加控件
-            GridPane gridPane = new GridPane();
-            gridPane.setHgap(10);
-            gridPane.setVgap(10);
-            gridPane.setAlignment(Pos.CENTER);
-            gridPane.add(usernameLabel, 0, 0);
-            gridPane.add(usernameField, 0, 1);
-            gridPane.add(passwordLabel, 0, 2);
-            gridPane.add(passwordField, 0, 3);
+            AnchorPane.setTopAnchor(usernameLabel, 315.0);
+            AnchorPane.setLeftAnchor(usernameLabel, 200.0);
+            AnchorPane.setRightAnchor(usernameLabel, 200.0);
 
-            gridPane.add(registerButton, 0, 4);
+            AnchorPane.setTopAnchor(usernameField, 340.0);
+            AnchorPane.setLeftAnchor(usernameField, 200.0);
+            AnchorPane.setRightAnchor(usernameField, 200.0);
 
-            GridPane.setValignment(usernameLabel, VPos.CENTER);
-            GridPane.setHalignment(usernameField, HPos.CENTER);
-            GridPane.setValignment(usernameField, VPos.CENTER);
-            GridPane.setHalignment(passwordLabel, HPos.CENTER);
-            GridPane.setValignment(passwordLabel, VPos.CENTER);
-            GridPane.setHalignment(passwordField, HPos.CENTER);
-            GridPane.setValignment(passwordField, VPos.CENTER);
+            AnchorPane.setTopAnchor(passwordLabel, 385.0);
+            AnchorPane.setLeftAnchor(passwordLabel, 200.0);
+            AnchorPane.setRightAnchor(passwordLabel, 200.0);
 
-            GridPane.setHalignment(registerButton, HPos.CENTER);
-            GridPane.setValignment(registerButton, VPos.CENTER);
+            AnchorPane.setTopAnchor(passwordField, 410.0);
+            AnchorPane.setLeftAnchor(passwordField, 200.0);
+            AnchorPane.setRightAnchor(passwordField, 200.0);
 
 
-            StackPane stackPane = new StackPane(gridPane);
-            stackPane.setAlignment(Pos.CENTER);
+
+            AnchorPane.setTopAnchor(registerButton, 470.0);
+            AnchorPane.setLeftAnchor(registerButton, 200.0);
+            AnchorPane.setRightAnchor(registerButton, 200.0);
+
+            anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField,  registerButton);
 
             // 创建场景并设置到舞台
-            Scene scene = new Scene(stackPane, 300, 200);
-            scene.getStylesheets().add(App.class.getResource("/style/button.css").toExternalForm());
+            Scene scene = new Scene(anchorPane, 500, 600);
+            scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.show();
         });
@@ -202,6 +214,13 @@ public class App extends Application {
 
     private static void handleRegister(String username, String password) throws SQLException {
         // 处理注册逻辑
+        if(username==null || password==null) {
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("错误");
+            alert.setHeaderText(null);
+            alert.setContentText("不能为空！");
+            alert.showAndWait();
+        }
         Manager sqlManager = new Manager();
         if (sqlManager.userfind(username)) {
             Alert alert = new Alert(AlertType.ERROR);
@@ -267,7 +286,7 @@ public class App extends Application {
         }
 
         Platform.runLater(() -> App.showLoginUI());
-        // 等待登录成功
+        // 等待login成功
         while (!App.loginSuccessful) {
             try {
                 Thread.sleep(100); // 等待100毫秒
