@@ -1,6 +1,14 @@
-package sqlOper;
+package sqlOperator;
 
+import sshWeb.SSHService;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Properties;
+
+import static security.CryptoUtil.decrypt;
+
 
 
 public class Manager {
@@ -11,13 +19,30 @@ public class Manager {
 
     public Manager() {
         try {
-            //因为宿舍校园网无法连接云端MySQL，此处暂时用本地的来连接
+
+
+
+
+
+
+
             Driver driver = new com.mysql.jdbc.Driver();
             DriverManager.registerDriver(driver);
-
-            String url = "jdbc:mysql://localhost:3306/user?useSSL=false&allowPublicKeyRetrieval=true";
+            InputStream is = SSHService.class.getClassLoader().getResourceAsStream("SSH.properties");
+            Properties prop = new Properties();
+            try {
+                prop.load(is);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String url = "jdbc:mysql://localhost:3307/javapro?useSSL=false&allowPublicKeyRetrieval=true";
             String user = "root";
-            String password = "123456";
+            String password = null;
+            try {
+                password = decrypt(prop.getProperty("password"),prop.getProperty("key") );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             conn = DriverManager.getConnection(url, user, password);
             System.out.println(conn);
 

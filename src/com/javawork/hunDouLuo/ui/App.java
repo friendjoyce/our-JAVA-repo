@@ -12,7 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import sqlOper.Manager;
+import sqlOperator.Manager;
 
 import java.sql.SQLException;
 

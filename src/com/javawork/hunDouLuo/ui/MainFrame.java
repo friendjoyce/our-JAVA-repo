@@ -2,10 +2,8 @@
  
 // import sun.audio.AudioPlayer;
 
-import com.javawork.hunDouLuo.ui.App;
-import javafx.application.Application;
 import javafx.application.Platform;
-import sqlOper.Manager;
+import sshWeb.SSHService;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -1270,6 +1268,8 @@ import java.util.Random;
 
  
    public static void main(String[] args) {
+     SSHService ssh = new SSHService();
+     ssh.sshRun();
      Platform.setImplicitExit(false);
      username = App.gameStartfx();
      Thread game = new Thread(new MainFrame());
