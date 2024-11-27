@@ -1,6 +1,7 @@
 <center><h2>魂动罗小游戏</h2></center>
 yjx,zy,xrh,yf
-## 1. Demo简介
+
+## 1.Demo简介
 
 这里最后可以写我们的项目介绍，或者有关项目的技术点，或者项目使用的工具。有什么比较重点的知识点也可以写
 本demo仿制了一个魂斗罗小游戏，纯JavaSE实现。
@@ -9,6 +10,7 @@ yjx,zy,xrh,yf
 * 图片显示
 * 音频播放
 * 多线程控制
+* jdbc+MySQL的使用
 ## 2. demo使用
 ```java
 
@@ -30,14 +32,14 @@ yjx,zy,xrh,yf
         e.printStackTrace();
     }
     
-    //生命耗尽，游戏结束调用
+    //生命耗尽，游戏结束调用,弹出结束ui
     try {
         App.gameEnd(username,score);
     } catch (SQLException e) {
         e.printStackTrace();
         throw new RuntimeException(e);
     }
-    return;
+    
 }
  
 //按照右侧使用说明控制，
@@ -48,4 +50,4 @@ yjx,zy,xrh,yf
 ## 3. 总结
 
 ## 4.一些资源的使用：
-    ##### 1. 字体：https://www.dafont.com/championship.font
+    ##### 1. 字体：https://www.dafont.com/championship.font（只有大写英文字母）
