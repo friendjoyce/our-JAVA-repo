@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 public class App extends Application {
 
+    public static LoginSoundThread lgsound;
     private static Stage primaryStage;
     private static Stage gameEndStage;
     public static boolean loginSuccessful = false;
@@ -65,7 +66,8 @@ public class App extends Application {
             Button loginButton = new Button();
             loginButton.getStyleClass().add("button");
             loginButton.setText("LOGIN");
-
+            lgsound=new LoginSoundThread();
+            new Thread(lgsound).start();
             loginButton.setOnAction(e -> {
                 username = usernameField.getText();
                 String password = passwordField.getText();
@@ -202,6 +204,9 @@ public class App extends Application {
             alert.setHeaderText(null);
             alert.setContentText("欢迎, " + username + "!");
             alert.showAndWait();
+            if (lgsound != null) {
+                lgsound.stopLoginSound();
+            }
             primaryStage.hide();
         } else {
             Alert alert = new Alert(AlertType.ERROR);
@@ -304,10 +309,6 @@ public class App extends Application {
 
         Manager sqlmanager = new Manager();
         int stateofupdate = sqlmanager.userUpdateScore(username, score);
-
-
-
-
             App.showGameEndUI(username, score, stateofupdate); // 示例参数
 
     }

@@ -372,8 +372,6 @@ import java.util.Random;
          heroBirth();
        }
        if(this.heroNum==0){
-
-
          running = false;
        }
        if ((this.hero.position.x > 3260.0F) && (this.mapPosition < 3328.0F) && (this.playPreBossStoneSound)) {
@@ -388,13 +386,8 @@ import java.util.Random;
          playPreBossBattle(this.big);
      }
      gameStartBgSoundThread.stopBackgroundMusic();
-
      dispose();
-
    }
-
-
-
    private void enemyShotControl()
    {
      for (int i = 0; i < this.enemys.size(); i++)

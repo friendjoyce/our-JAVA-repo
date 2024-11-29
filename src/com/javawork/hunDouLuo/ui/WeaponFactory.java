@@ -1,5 +1,4 @@
  package com.javawork.hunDouLuo.ui;
- 
  public class WeaponFactory
  {
    static Weapon weapon;
