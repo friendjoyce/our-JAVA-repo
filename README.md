@@ -10,6 +10,7 @@ yjx,zy,xrh,yf
 * 图片显示
 * 音频播放
 * 多线程控制
+* 图形绘制的双缓冲机制
 * jdbc+MySQL的使用
 ## 2. demo使用
 ```java
