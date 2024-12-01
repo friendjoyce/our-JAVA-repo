@@ -27,7 +27,7 @@ public class App extends Application {
     private static Stage primaryStage;
     private static Stage gameEndStage;
     public static boolean loginSuccessful = false;
-    private static String password;
+
     private static String username;
 
     public static String getUsername() {
@@ -66,8 +66,12 @@ public class App extends Application {
             Button loginButton = new Button();
             loginButton.getStyleClass().add("button");
             loginButton.setText("LOGIN");
-            lgsound=new LoginSoundThread();
-            new Thread(lgsound).start();
+
+
+
+
+
+
             loginButton.setOnAction(e -> {
                 username = usernameField.getText();
                 String password = passwordField.getText();
@@ -121,11 +125,16 @@ public class App extends Application {
 
             primaryStage.setScene(scene);
             primaryStage.show();
+
+            lgsound=new LoginSoundThread();
+            new Thread(lgsound).start();
+
+
         });
     }
 
     public static void showRegisterUI() {
-        Platform.runLater(() -> {
+
             // 创建username标签和输入框
 
 //            Label titleLabel = new Label("全球排名！\n 梦回经典--魂斗罗");
@@ -190,7 +199,7 @@ public class App extends Application {
             scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
             primaryStage.setScene(scene);
             primaryStage.show();
-        });
+
     }
 
     private static void handleLogin(String username, String password) throws SQLException {
@@ -199,14 +208,16 @@ public class App extends Application {
         boolean findflag = sqlManager.userfind(username, password);
         if (findflag) {
             loginSuccessful = true;
+
             Alert alert = new Alert(AlertType.INFORMATION);
             alert.setTitle("登录成功");
             alert.setHeaderText(null);
             alert.setContentText("欢迎, " + username + "!");
-            alert.showAndWait();
             if (lgsound != null) {
                 lgsound.stopLoginSound();
             }
+
+            alert.showAndWait();
             primaryStage.hide();
         } else {
             Alert alert = new Alert(AlertType.ERROR);
