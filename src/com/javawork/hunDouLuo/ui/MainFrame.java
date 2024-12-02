@@ -1263,6 +1263,8 @@ import java.util.Random;
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
+     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
+
 
      Platform.setImplicitExit(false);
      username = App.gameStartfx();

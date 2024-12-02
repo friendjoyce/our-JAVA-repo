@@ -16,11 +16,13 @@ public class LoginSoundThread extends Thread {
     private MediaPlayer mediaPlayer;
     public boolean playSound = true;
     private final CountDownLatch latch = new CountDownLatch(1);
+    public boolean isplaying = false;
 
     @Override
     public void run() {
         try {
             playLoginSound();
+            isplaying = true;
         } catch (Exception e) {
             e.printStackTrace();
         }

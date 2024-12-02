@@ -1,10 +1,13 @@
 package sqlOperator;
 
+import entity.User;
 import sshWeb.SSHService;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import static security.CryptoUtil.decrypt;
@@ -129,14 +132,17 @@ public class Manager {
 
     }
 
-    public void userinsert(String name, String password, int score) throws SQLException {
-
+    public boolean userinsert(String name, String password, int score) throws SQLException {
+        if(name.isEmpty()&&password.isEmpty()) {
+            return false;
+        }
         String sql = "insert into user values(?,?,?);";
         ps = conn.prepareStatement(sql);
         ps.setString(1, name);
         ps.setString(2, password);
         ps.setString(3, score + "");
         ps.executeUpdate();
+        return true;
     }
 
     public int userUpdateScore(String username, int score) throws SQLException {
@@ -167,6 +173,22 @@ public class Manager {
 
 
     }
+
+    public List<User> getTop5UsersByScore() throws SQLException {
+        List<User> topUsers = new ArrayList<>();
+        String sql = "SELECT username, score FROM user ORDER BY score DESC LIMIT 5;";
+        ps = conn.prepareStatement(sql);
+        rs = ps.executeQuery();
+        while (rs.next()) {
+            String username = rs.getString("username");
+            int score = rs.getInt("score");
+            topUsers.add(new User(username, score));
+        }
+        return topUsers;
+    }
+
+
+
 
 
 }
