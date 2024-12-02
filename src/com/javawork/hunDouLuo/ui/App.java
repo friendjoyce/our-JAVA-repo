@@ -49,7 +49,7 @@ public class App extends Application {
 
     public static void showLoginUI() {
         Platform.runLater(() -> {
-
+            primaryStage.setTitle("LOGIN");
 
             Label usernameLabel = new Label("USERNAME:");
             usernameLabel.getStyleClass().add("label1");
@@ -147,7 +147,7 @@ public class App extends Application {
     }
 
     public static void showRegisterUI() {
-
+             primaryStage.setTitle("ENROLL");
             Label usernameLabel = new Label("USERNAME:");
             usernameLabel.getStyleClass().add("label1");
             TextField usernameField = new TextField();
@@ -289,7 +289,7 @@ public class App extends Application {
 
     private static Line createVerticalSeparator() {
         Line separator = new Line(0, 0, 0, 20);
-        separator.setStroke(Color.color( 0.501, 0.34, 0));
+        separator.setStroke(Color.color( 0.501, 0.3398, 0));
         return separator;
     }
 
