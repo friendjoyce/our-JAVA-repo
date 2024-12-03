@@ -37,6 +37,15 @@
     -fx-opacity: 0.5;
 }
 
+.text1{
+    -fx-font-family: "Championship";
+    -fx-font-size: 25px;
+    -fx-font-weight: 900;
+    -fx-fill: rgb(128, 87, 0);
+
+
+}
+
 .root{
     -fx-background-image: url("../../graphics/someui/title.png");
     -fx-background-repeat: no-repeat;

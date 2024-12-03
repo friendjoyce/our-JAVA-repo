@@ -22,8 +22,7 @@ public class App extends Application {
     public static LoginSoundThread lgsound;
     private static Stage primaryStage;
     private static Stage gameEndStage;
-    private static Stage rankingStage;
-    private static Stage lstage;
+
     public static boolean loginSuccessful = false;
 
     private static String username;
@@ -65,15 +64,7 @@ public class App extends Application {
             loginButton.getStyleClass().add("button");
             loginButton.setText("LOGIN");
 
-            Button rankButton = new Button("RANK");
-            rankButton.getStyleClass().add("button");
-            rankButton.setOnAction(e -> {
-                try {
-                    showRankingUI();
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
+
 
 
 
@@ -124,12 +115,10 @@ public class App extends Application {
             AnchorPane.setLeftAnchor(registerButton, 200.0);
             AnchorPane.setRightAnchor(registerButton, 200.0);
 
-            AnchorPane.setTopAnchor(rankButton, 530.0);
-            AnchorPane.setLeftAnchor(rankButton, 200.0);
-            AnchorPane.setRightAnchor(rankButton, 200.0);
 
 
-            anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, loginButton, registerButton, rankButton);
+
+            anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, loginButton, registerButton);
 
             // 创建场景并设置到舞台
             Scene scene = new Scene(anchorPane, 500, 600);
@@ -219,108 +208,9 @@ public class App extends Application {
 
 
 
-    public  static void showRankingUI() throws SQLException {
-        primaryStage.setTitle("TOP 5 PLAYER");
-
-        GridPane header = new GridPane();
-        header.setAlignment(Pos.CENTER);
-        header.setHgap(10);
-
-        ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPrefWidth(140);
-        ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPrefWidth(10);
-        ColumnConstraints col3 = new ColumnConstraints();
-        col3.setPrefWidth(60);
-        header.getColumnConstraints().addAll(col1, col2, col3);
-
-        Label usernameHeader = new Label("USERNAME");
-        usernameHeader.getStyleClass().add("label1");
-
-
-        Label scoreHeader = new Label("SCORE");
-        scoreHeader.getStyleClass().add("label1");
-
-
-        header.add(usernameHeader, 0, 0);
-        header.add(createVerticalSeparator(), 1, 0);
-        header.add(scoreHeader, 2, 0);
 
 
 
-        VBox vbox = new VBox(10); // 设置 VBox 的间距为 10
-        vbox.setPadding(new Insets(10)); // 设置 VBox 的内边距
-        vbox.getStyleClass().add("root");
-
-        // 创建一个 Region 用于占据上半部分的空间
-        Region spacer = new Region();
-        spacer.setPrefHeight(350);
-
-        VBox bottomBox = new VBox(10);
-        bottomBox.setAlignment(Pos.CENTER);
-
-        bottomBox.getChildren().add(header);
-
-        Button backButton = new Button("BACK");
-        backButton.getStyleClass().add("button");
-
-        backButton.setOnAction(e -> {
-            showLoginUI();
-        });
-
-        VBox buttonBox = new VBox(backButton);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.setPadding(new Insets(10, 0, 0, 0));
-
-        // 加载用户数据
-        loadUserData(bottomBox);
-
-        vbox.getChildren().addAll(spacer, bottomBox,buttonBox);
-
-        Scene scene = new Scene(vbox, 500, 600);
-        scene.getStylesheets().add(App.class.getResource("/style/rank.css").toExternalForm());
-
-        primaryStage.setScene(scene);
-        primaryStage.show();
-
-    }
-
-    private static Line createVerticalSeparator() {
-        Line separator = new Line(0, 0, 0, 20);
-        separator.setStroke(Color.color( 0.501, 0.3398, 0));
-        return separator;
-    }
-
-    private static void loadUserData(VBox bottomBox) {
-        Manager manager = new Manager();
-        try {
-            List<User> topUsers = manager.getTop5UsersByScore();
-            for (User user : topUsers) {
-                GridPane row = new GridPane();
-                row.setAlignment(Pos.CENTER);
-                row.setHgap(10);
-
-                ColumnConstraints col1 = new ColumnConstraints();
-                col1.setPrefWidth(140);
-                ColumnConstraints col2 = new ColumnConstraints();
-                col2.setPrefWidth(10);
-                ColumnConstraints col3 = new ColumnConstraints();
-                col3.setPrefWidth(60);
-                row.getColumnConstraints().addAll(col1, col2, col3);
-
-                Label usernameLabel = new Label(user.getUsername());
-                Label scoreLabel = new Label(String.valueOf(user.getScore()));
-
-                row.add(usernameLabel, 0, 0);
-                row.add(createVerticalSeparator(), 1, 0);
-                row.add(scoreLabel, 2, 0);
-
-                bottomBox.getChildren().add(row);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     private static void handleLogin(String username, String password) throws SQLException {
         // 处理登录逻辑
