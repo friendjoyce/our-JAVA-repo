@@ -24,6 +24,7 @@ yjx,zy,xrh,yf
     Platform.setImplicitExit(false);
     //记录当前玩家的username
     username = App.gameStartfx();
+//为了编辑开始界面,yjx刚才对测试的主逻辑进行更改,现在mainframe的运行(游戏主逻辑)放在menuScene之中,按开始游戏进行mainframe的运行,现在界面的菜单只有这个功能,而且界面简陋,可以自行添加功能菜单.
     //启动主游戏
     Thread game = new Thread(new MainFrame());
     game.start();
