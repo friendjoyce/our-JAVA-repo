@@ -55,7 +55,7 @@
  
    private void drawDiedBossAnimation(Graphics2D g, float mapPosition)
    {
-     g.drawImage(Imgs.BOSSBOMBBED, (int)(this.position.x - mapPosition) * 3 - 150, (int)this.position.y * 3 - 170, null);
+     g.drawImage(Imgs.BOSSBOMBBED, (int)(this.position.x - mapPosition) * 3 - 150, (int)this.position.y * 3 - 400, null);
    }
  
    private void flyingAnimation(Graphics2D g, float mapPosition)

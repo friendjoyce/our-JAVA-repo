@@ -4,7 +4,6 @@
 
 import javafx.application.Platform;
 import sshWeb.SSHService;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -42,7 +41,7 @@ import java.util.Random;
    private boolean upDown = false;
    private boolean downDown = false;
    private boolean jumpDown = false;
-   private int heroNum = 1;
+   private int heroNum = 100;
    private List<SimpleEnemy> enemys = new ArrayList();
    private boolean showBossScene = false;
    private Boss boss;
@@ -379,11 +378,12 @@ import java.util.Random;
          this.playPreBossStoneSound = false;
         this.preBossBgSoundThread = new PreBossBackgroundSoundThread();
         new Thread(this.preBossBgSoundThread).start();
+
         this.gameStartBgSoundThread.stopBackgroundMusic();
         this.gameStartBgSoundThread.playSound = false;
        }
        if (this.preBossBattle)
-         playPreBossBattle(this.big);
+          playPreBossBattle(this.big);
      }
      gameStartBgSoundThread.stopBackgroundMusic();
      dispose();
@@ -1266,21 +1266,20 @@ import java.util.Random;
 
      Platform.setImplicitExit(false);
      username = App.gameStartfx();
-     Thread game = new Thread(new MainFrame());
-     game.start();
-     try {
-       game.join();
-     } catch (InterruptedException e) {
-       e.printStackTrace();
-     }
-
-     try {
-       App.gameEnd(username,score);
-     } catch (SQLException e) {
-       e.printStackTrace();
-       throw new RuntimeException(e);
-     }
-    return;
+//     Thread game = new Thread(new MainFrame());
+//     game.start();
+//     try {
+//       game.join();
+//     } catch (InterruptedException e) {
+//       e.printStackTrace();
+//     }
+//
+//     try {
+//       App.gameEnd(username,score);
+//     } catch (SQLException e) {
+//       e.printStackTrace();
+//       throw new RuntimeException(e);
+//     }
    }
  }
 

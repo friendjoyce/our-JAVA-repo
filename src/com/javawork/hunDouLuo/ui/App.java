@@ -216,9 +216,11 @@ public class App extends Application {
             if (lgsound != null) {
                 lgsound.stopLoginSound();
             }
+            MenuScene menuScene = new MenuScene(primaryStage);
+            menuScene.showMenu();
+//            alert.showAndWait();
+//            primaryStage.hide();
 
-            alert.showAndWait();
-            primaryStage.hide();
         } else {
             Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("登录失败");
@@ -254,7 +256,6 @@ public class App extends Application {
             showLoginUI();
         }
     }
-
     public static void showGameEndUI(String username, int score, int state) {
         Platform.runLater(() -> {
 
