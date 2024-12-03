@@ -8,10 +8,6 @@ import java.io.File;
 
 
 import java.util.concurrent.CountDownLatch;
-
-
-
-
 public class LoginSoundThread extends Thread {
     private MediaPlayer mediaPlayer;
     public boolean playSound = true;

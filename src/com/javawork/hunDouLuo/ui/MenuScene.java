@@ -17,33 +17,27 @@ public class MenuScene {
 
     public void showMenu() {
         AnchorPane pane = new AnchorPane();
-
         // 菜单标题
         Text title = new Text("菜单");
         title.setStyle("-fx-font-size: 24; -fx-fill: white;");
         AnchorPane.setTopAnchor(title, 50.0);
         AnchorPane.setLeftAnchor(title, 200.0);
-
         // 创建菜单按钮
         Button startGameButton = new Button("开始游戏");
         startGameButton.setStyle("-fx-font-size: 16; -fx-background-color: lightblue;");
         startGameButton.setOnAction(e -> startGame());
-
         Button exitButton = new Button("退出游戏");
         exitButton.setStyle("-fx-font-size: 16; -fx-background-color: lightblue;");
         exitButton.setOnAction(e -> stage.close());
-
         // 布局按钮
         AnchorPane.setTopAnchor(startGameButton, 100.0);
         AnchorPane.setLeftAnchor(startGameButton, 200.0);
 
         AnchorPane.setTopAnchor(exitButton, 150.0);
         AnchorPane.setLeftAnchor(exitButton, 200.0);
-
         pane.getChildren().addAll(title, startGameButton, exitButton);
-
         // 设置场景
-        Scene scene = new Scene(pane, 500, 400);
+        Scene scene = new Scene(pane, 900, 672);
         scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
         stage.setScene(scene);
     }
@@ -53,6 +47,7 @@ public class MenuScene {
         System.out.println("启动魂斗罗游戏...");
         Thread game = new Thread(new MainFrame());
         game.start();
+        App.getPrimaryStage().hide();
         try {
             game.join();
         } catch (InterruptedException e) {

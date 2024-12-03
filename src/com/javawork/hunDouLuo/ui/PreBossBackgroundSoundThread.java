@@ -10,26 +10,19 @@ public class PreBossBackgroundSoundThread implements Runnable {
     public void run() {
         playBackgroundSound();
     }
-
     private void playBackgroundSound() {
         try {
             String soundPath = "audios/stone_landing.wav"; // 替换为音频文件路径
             clip = Audios.getAudioPlayer(soundPath);
-
-            // 播放音效
-            clip.start();
-
-            // 等待音效播放完成
-            while (playSound && clip.isRunning()) {
-                Thread.sleep(152000L); // 每隔 200ms 检查一次
+            clip.loop(Clip.LOOP_CONTINUOUSLY); // 设置为无限循环
+            while (playSound) {
+                Thread.sleep(200L); // 每隔200ms检查playSound标志
             }
-
-            // 停止播放
             clip.stop();
             clip.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

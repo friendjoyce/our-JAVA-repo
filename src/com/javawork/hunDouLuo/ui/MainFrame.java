@@ -71,8 +71,6 @@ import java.util.Random;
    private volatile boolean running = true; // 标志位
    public static String username;
 
-
- 
    public MainFrame()
    {
 
@@ -1256,16 +1254,10 @@ import java.util.Random;
          this.hero.position.x = (this.backgroundSizeOfWidth / 6.0F + this.mapPosition);
        }
    }
-
-
-
- 
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
      System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
-
-
      Platform.setImplicitExit(false);
      username = App.gameStartfx();
 //     Thread game = new Thread(new MainFrame());
