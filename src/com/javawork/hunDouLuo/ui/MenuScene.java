@@ -34,6 +34,16 @@ public class MenuScene {
         AnchorPane.setLeftAnchor(title, 395.0);
         title.getStyleClass().add("text1");
 
+        // 标题动画
+        ScaleTransition titleScaleEnter = new ScaleTransition(Duration.millis(500), title);
+        titleScaleEnter.setFromX(1.0);
+        titleScaleEnter.setFromY(1.0);
+        titleScaleEnter.setToX(1.2);
+        titleScaleEnter.setToY(1.2);
+        titleScaleEnter.setCycleCount(1);
+        titleScaleEnter.setAutoReverse(true);
+        titleScaleEnter.play();
+
         // 创建菜单按钮
         Button startGameButton = new Button("START GAME 开始游戏");
         Button exitButton = new Button("EXIT 退出游戏");
