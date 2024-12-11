@@ -36,7 +36,6 @@ public class App extends Application {
         lgsound = new LoginSoundThread();
         App.primaryStage = primaryStage;
         primaryStage.setTitle("LOGIN");
-        primaryStage.setResizable(false);
         showLoginUI();
 
         // 创建第二个窗口，但不显示
@@ -121,7 +120,7 @@ public class App extends Application {
             anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, loginButton, registerButton);
 
             // 创建场景并设置到舞台
-            Scene scene = new Scene(anchorPane, 500, 600);
+            Scene scene = new Scene(anchorPane, 900, 672);
             scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
 
             primaryStage.setScene(scene);
