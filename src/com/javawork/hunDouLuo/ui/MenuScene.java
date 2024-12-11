@@ -1,6 +1,7 @@
 package com.javawork.hunDouLuo.ui;
 
 import entity.User;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import sqlOperator.Manager;
 
 import java.sql.SQLException;
@@ -30,18 +32,21 @@ public class MenuScene {
 
         AnchorPane.setTopAnchor(title, 400.0);
         AnchorPane.setLeftAnchor(title, 395.0);
-        //AnchorPane.setRightAnchor(title, 410.0);
         title.getStyleClass().add("text1");
+
         // 创建菜单按钮
         Button startGameButton = new Button("START GAME 开始游戏");
-
-        startGameButton.setOnAction(e -> startGame());
         Button exitButton = new Button("EXIT 退出游戏");
-
-        exitButton.setOnAction(e -> stage.close());
-
         Button rankButton = new Button("RANK 排名");
-        rankButton.getStyleClass().add("button");
+
+        // 应用动画到按钮
+        addHoverAnimation(startGameButton);
+        addHoverAnimation(exitButton);
+        addHoverAnimation(rankButton);
+
+        // 按钮事件绑定
+        startGameButton.setOnAction(e -> startGame());
+        exitButton.setOnAction(e -> stage.close());
         rankButton.setOnAction(e -> {
             try {
                 showRankingUI();
@@ -49,11 +54,11 @@ public class MenuScene {
                 throw new RuntimeException(ex);
             }
         });
+
         // 布局按钮
         AnchorPane.setTopAnchor(startGameButton, 500.0);
         AnchorPane.setLeftAnchor(startGameButton, 250.0);
         AnchorPane.setRightAnchor(startGameButton, 250.0);
-
 
         AnchorPane.setTopAnchor(exitButton, 550.0);
         AnchorPane.setLeftAnchor(exitButton, 250.0);
@@ -63,13 +68,13 @@ public class MenuScene {
         AnchorPane.setLeftAnchor(rankButton, 250.0);
         AnchorPane.setRightAnchor(rankButton, 250.0);
 
-        pane.getChildren().addAll(title, startGameButton, exitButton,rankButton);
+        pane.getChildren().addAll(title, startGameButton, exitButton, rankButton);
+
         // 设置场景
         Scene scene = new Scene(pane, 900, 672);
         scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
         stage.setScene(scene);
     }
-
 
     public void showRankingUI() throws SQLException {
         stage.setTitle("TOP 5 PLAYER");
@@ -89,22 +94,17 @@ public class MenuScene {
         Label usernameHeader = new Label("USERNAME");
         usernameHeader.getStyleClass().add("label1");
 
-
         Label scoreHeader = new Label("SCORE");
         scoreHeader.getStyleClass().add("label1");
-
 
         header.add(usernameHeader, 0, 0);
         header.add(createVerticalSeparator(), 1, 0);
         header.add(scoreHeader, 2, 0);
 
-
-
-        VBox vbox = new VBox(10); // 设置 VBox 的间距为 10
-        vbox.setPadding(new Insets(10)); // 设置 VBox 的内边距
+        VBox vbox = new VBox(10);
+        vbox.setPadding(new Insets(10));
         vbox.getStyleClass().add("root");
 
-        // 创建一个 Region 用于占据上半部分的空间
         Region spacer = new Region();
         spacer.setPrefHeight(400);
 
@@ -115,6 +115,7 @@ public class MenuScene {
 
         Button backButton = new Button("BACK");
         backButton.getStyleClass().add("button");
+        addHoverAnimation(backButton);
 
         backButton.setOnAction(e -> {
             showMenu();
@@ -124,22 +125,20 @@ public class MenuScene {
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(10, 0, 0, 0));
 
-        // 加载用户数据
         loadUserData(bottomBox);
 
-        vbox.getChildren().addAll(spacer, bottomBox,buttonBox);
+        vbox.getChildren().addAll(spacer, bottomBox, buttonBox);
 
         Scene scene = new Scene(vbox, 900, 672);
         scene.getStylesheets().add(App.class.getResource("/style/rank.css").toExternalForm());
 
         stage.setScene(scene);
         stage.show();
-
     }
 
     private static Line createVerticalSeparator() {
         Line separator = new Line(0, 0, 0, 20);
-        separator.setStroke(Color.color( 0.501, 0.3398, 0));
+        separator.setStroke(Color.color(0.501, 0.3398, 0));
         return separator;
     }
 
@@ -175,7 +174,6 @@ public class MenuScene {
     }
 
     private void startGame() {
-        // 调用魂斗罗游戏的启动逻辑
         System.out.println("启动魂斗罗游戏...");
         Thread game = new Thread(new MainFrame());
         game.start();
@@ -187,10 +185,23 @@ public class MenuScene {
         }
 
         try {
-            App.gameEnd(MainFrame.username,MainFrame.score);
+            App.gameEnd(MainFrame.username, MainFrame.score);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    private static void addHoverAnimation(Button button) {
+        ScaleTransition scaleEnter = new ScaleTransition(Duration.millis(200), button);
+        scaleEnter.setToX(1.1);
+        scaleEnter.setToY(1.1);
+
+        ScaleTransition scaleExit = new ScaleTransition(Duration.millis(200), button);
+        scaleExit.setToX(1.0);
+        scaleExit.setToY(1.0);
+
+        button.setOnMouseEntered(e -> scaleEnter.playFromStart());
+        button.setOnMouseExited(e -> scaleExit.playFromStart());
     }
 }
