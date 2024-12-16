@@ -73,8 +73,6 @@ import java.util.Random;
 
    public MainFrame()
    {
-
-
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
      new Thread(this.gameStartBgSoundThread).start();
      this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
@@ -133,7 +131,7 @@ import java.util.Random;
  
              MainFrame.this.hero.canShot = false;
            }
-           if ((KeyEvent.getKeyText(e.getKeyCode()).equals("K")) && 
+           if ((KeyEvent.getKeyText(e.getKeyCode()).equals("K")||KeyEvent.getKeyText(e.getKeyCode()).equals(" ")) &&
              (MainFrame.this.hero.canDrop) && (MainFrame.this.hero.state == 3) && (MainFrame.this.hero.position.y < MainFrame.this.backgroundSizeOfHeight - 60)) {
              if (MainFrame.this.hero.position.y < 206.0F)
                MainFrame.this.hero.position.y += 6.0F;
@@ -146,6 +144,7 @@ import java.util.Random;
  
    private void initEnemys()
    {
+     //0-3都是那个只会跑的,不过有的会跳,有的会之间冲过来,4是只站立的射击怪
      SimpleEnemy[] enemy0 = { new SimpleEnemy(new FloatPoint(300.0F, 100.0F), 6, 0), 
        new SimpleEnemy(new FloatPoint(332.0F, 100.0F), 6, 0), 
        new SimpleEnemy(new FloatPoint(390.0F, 100.0F), 6, 0), 
@@ -885,6 +884,7 @@ import java.util.Random;
  
    private void initGrassLands()
    {
+     //逻辑上的单位联系真正画图的像素
      FloatPoint[] points = { new FloatPoint(1.0F, 110.0F), new FloatPoint(5.0F, 142.0F), new FloatPoint(8.0F, 174.0F), 
        new FloatPoint(9.0F, 206.0F), new FloatPoint(11.0F, 174.0F), new FloatPoint(13.0F, 142.0F), new FloatPoint(18.0F, 206.0F), 
        new FloatPoint(19.0F, 158.0F), new FloatPoint(27.0F, 110.0F), new FloatPoint(36.0F, 110.0F), new FloatPoint(42.0F, 78.0F), 
@@ -911,6 +911,7 @@ import java.util.Random;
    }
  
    private boolean isGrassLand(float x, float y) {
+     //*是对应关系,+-是根据位置进行碰撞的位置监测修复
      if (this.hero.towardsRight) {
        for (int i = 0; i < this.grassLands.length; i++) {
          if ((x > this.grassLands[i].position.x * 32.0F - 7.0F) && (x < (this.grassLands[i].position.x + this.grassLands[i].length) * 32.0F + 3.0F) && 
