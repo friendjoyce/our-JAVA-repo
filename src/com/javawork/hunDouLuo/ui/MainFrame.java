@@ -329,7 +329,7 @@ import java.util.Random;
        this.enemys.add(e);
        this.simpleEnemyNum += 1;
      }
-     else if ((this.simpleEnemyNum >= 200) && (this.enemys.size() < 1)) {
+     else if ((this.simpleEnemyNum >= 0) && (this.enemys.size() < 1)) {
        this.preBossBattle = false;
        this.bossBattle = true;
        this.boss = new Boss(new FloatPoint(this.backgroundSizeOfWidth / 6 + this.mapPosition, 70.0F));
