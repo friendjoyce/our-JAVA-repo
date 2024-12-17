@@ -202,7 +202,7 @@ public class MenuScene {
         }
     }
 
-    private static void addHoverAnimation(Button button) {
+    static void addHoverAnimation(Button button) {
         ScaleTransition scaleEnter = new ScaleTransition(Duration.millis(200), button);
         scaleEnter.setToX(1.1);
         scaleEnter.setToY(1.1);

@@ -1,6 +1,7 @@
 package com.javawork.hunDouLuo.ui;
 
 import entity.User;
+import javafx.animation.ScaleTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -12,10 +13,13 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import sqlOperator.Manager;
 
 import java.sql.SQLException;
 import java.util.List;
+
+import static com.javawork.hunDouLuo.ui.MenuScene.addHoverAnimation;
 
 public class App extends Application {
 
@@ -86,6 +90,11 @@ public class App extends Application {
 
             registerButton.setOnAction(e -> showRegisterUI());
 
+
+            addHoverAnimation(registerButton);
+            addHoverAnimation(loginButton);
+
+
             // 创建布局并添加控件
             AnchorPane anchorPane = new AnchorPane();
 
@@ -95,16 +104,16 @@ public class App extends Application {
             AnchorPane.setRightAnchor(usernameLabel, 200.0);
 
             AnchorPane.setTopAnchor(usernameField, 340.0);
-            AnchorPane.setLeftAnchor(usernameField, 200.0);
-            AnchorPane.setRightAnchor(usernameField, 200.0);
+            AnchorPane.setLeftAnchor(usernameField, 350.0);
+            AnchorPane.setRightAnchor(usernameField, 350.0);
 
             AnchorPane.setTopAnchor(passwordLabel, 385.0);
             AnchorPane.setLeftAnchor(passwordLabel, 200.0);
             AnchorPane.setRightAnchor(passwordLabel, 200.0);
 
             AnchorPane.setTopAnchor(passwordField, 410.0);
-            AnchorPane.setLeftAnchor(passwordField, 200.0);
-            AnchorPane.setRightAnchor(passwordField, 200.0);
+            AnchorPane.setLeftAnchor(passwordField, 350.0);
+            AnchorPane.setRightAnchor(passwordField, 350.0);
 
             AnchorPane.setTopAnchor(loginButton, 450.0);
             AnchorPane.setLeftAnchor(loginButton, 200.0);
@@ -168,6 +177,8 @@ public class App extends Application {
                     throw new RuntimeException(ex);
                 }
             });
+            addHoverAnimation(registerButton);
+            addHoverAnimation(backButton);
 
             AnchorPane anchorPane = new AnchorPane();
             // 创建布局并添加控件
@@ -176,16 +187,16 @@ public class App extends Application {
             AnchorPane.setRightAnchor(usernameLabel, 200.0);
 
             AnchorPane.setTopAnchor(usernameField, 340.0);
-            AnchorPane.setLeftAnchor(usernameField, 200.0);
-            AnchorPane.setRightAnchor(usernameField, 200.0);
+            AnchorPane.setLeftAnchor(usernameField, 350.0);
+            AnchorPane.setRightAnchor(usernameField, 350.0);
 
             AnchorPane.setTopAnchor(passwordLabel, 385.0);
             AnchorPane.setLeftAnchor(passwordLabel, 200.0);
             AnchorPane.setRightAnchor(passwordLabel, 200.0);
 
             AnchorPane.setTopAnchor(passwordField, 410.0);
-            AnchorPane.setLeftAnchor(passwordField, 200.0);
-            AnchorPane.setRightAnchor(passwordField, 200.0);
+            AnchorPane.setLeftAnchor(passwordField, 350.0);
+            AnchorPane.setRightAnchor(passwordField, 350.0);
 
             AnchorPane.setTopAnchor(registerButton, 470.0);
             AnchorPane.setLeftAnchor(registerButton, 200.0);
