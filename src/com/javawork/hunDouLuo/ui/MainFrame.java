@@ -227,8 +227,10 @@ import java.util.Random;
      }
    }
 
+   //paint适合静态场景
    public void paint(Graphics g)
    {
+     //调用父类的paint函数,清除画布内容
      super.paint(g);
      g.setColor(Color.GRAY);
      g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
@@ -247,20 +249,36 @@ import java.util.Random;
 //     g.setFont(new Font(null, 1, 16));
 //     g.drawString("JAVA大作业DEMO", 780, 560);
    }
-
+   //update适合动态的场景使用
    public void update(Graphics g)
    {
+     //将 Graphics 对象转换为 Graphics2D，以便使用更多绘图功能。
      Graphics2D g2 = (Graphics2D)g;
+     //如果是第一次调用，初始化画布资源：
      if (this.firstTime) {
        Dimension dim = getSize();
        int w = dim.width;
        int h = dim.height;
        new Rectangle(dim);
+       //双缓冲的“双”：前缓冲：显示在屏幕上的画面。后缓冲：内存中的画布，用于准备下一帧内容。
+       //所有绘图操作都在后缓冲中完成。
+       //绘制完成后，将后缓冲的内容一次性复制到前缓冲（屏幕）。
+       //避免了直接在屏幕上多次绘图带来的闪烁现象。
        this.bi = ((BufferedImage)createImage(w, h));
+       //BufferedImage 是内存中的一块画布，用于存储最终的图像。
+       //它是绘图内容的容器。
        this.big = this.bi.createGraphics();
+       //this.big：操作后缓冲的绘图工具，是从 this.bi.createGraphics() 得到的 Graphics2D 对象。
+       //它负责在后缓冲（this.bi）上绘制所有内容。
        this.firstTime = false;
        this.big.setStroke(new BasicStroke(1.0F));
      }
+     //绘制背景图（Imgs.BACKGROUND01），动态调整背景位置和显示的大小。
+     //目标区域的左上角 (dx1, dy1)决定图像绘制在屏幕的起始位置。目标区域的右下角 (dx2, dy2)。决定图像在屏幕上的宽度和高度。后面四个是源图像的左上和右下,672其实是带着一点放大的背景,原图片也就224
+     //这个时候this.big还没绘制完成
+     //绘制顺序严格按照代码书写的顺序：
+     //背景 → NPC → 主角 → 子弹等。
+     //后绘制的内容会覆盖先绘制的内容。
      this.big.drawImage(Imgs.BACKGROUND01, (int)this.scenePosition.x, (int)this.scenePosition.y, this.backgroundSizeOfWidth, (int)this.scenePosition.y + 672, (int)this.mapPosition, 0, (int)this.mapPosition + this.backgroundSizeOfWidth / 3, 224, null);
      drawNPC(this.big);
      if (this.showBossScene) {
@@ -277,8 +295,11 @@ import java.util.Random;
      }
 
      if (!this.hero.visible) {
+       //设置是否可见(可被攻击)
        this.big.setComposite(this.alphaComposite);
      }
+     //draw 参数一直是 this.big,this.big 是从 BufferedImage 创建的 Graphics2D 对象,避免直接在屏幕上绘制，减少屏幕闪烁。
+     //所有绘制操作先在内存画布中完成，最后统一渲染到屏幕。通过 BufferedImage，可以保存整个画面状态，方便后续操作（如缩放、重绘等）
      this.hero.drawPlayer(this.big, this.mapPosition);
      this.big.setComposite(this.alphaComposite2);
      drawHeroBullets(this.big);
@@ -287,6 +308,8 @@ import java.util.Random;
      this.big.setFont(new Font(null, 1, 28));
      g2.setColor(Color.GRAY);
      g2.fillRect(0, 0, getWidth(), getHeight());
+     //this.big 是 Graphics2D，用于操作后缓冲。
+     //g2 是 Graphics2D，用于操作屏幕画布。
      g2.drawImage(this.bi, (int)this.bgPosition.x, (int)this.bgPosition.y, (int)(this.backgroundSizeOfWidth / 1.3D), (int)(this.backgroundSizeOfHeight / 1.3D), this);
    }
 
@@ -295,15 +318,17 @@ import java.util.Random;
      for (int i = 0; i < this.bossChildren.size(); i++) {
        ((BossChild)this.bossChildren.get(i)).position.y += 0.1F;
        ((BossChild)this.bossChildren.get(i)).drawBossChild(big2, this.mapPosition);
+       //子弹bu跟踪  :屏幕位置 = 物体绝对位置 - mapPosition
        this.enemyBullets.addAll(((BossChild)this.bossChildren.get(i)).simpleShot(new FloatPoint(this.hero.position.x, this.hero.position.y), 1));
      }
    }
- 
+
    private void playBossBattleAnimation(Graphics2D g)
    {
      this.boss.drawBoss(g, this.mapPosition);
      if ((this.boss != null) && (this.boss.isAlive))
        if (this.boss.life > this.boss.defaultLife / 3) {
+         //BOSS子弹跟踪  :屏幕位置 = 物体绝对位置 - mapPosition
          this.enemyBullets.addAll(this.boss.simpleShot(new FloatPoint(this.hero.position.x + 0.001F, this.hero.position.y + 0.001F), 1));
        }
        else if (this.boss.life > this.boss.defaultLife / 6) {
@@ -329,7 +354,8 @@ import java.util.Random;
          }
        }
    }
- 
+
+
    private void playPreBossBattle(Graphics2D big2)
    {
      this.timeCont += 1;

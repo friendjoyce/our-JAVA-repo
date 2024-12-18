@@ -60,17 +60,13 @@ public class App extends Application {
         if (lgsound != null && lgsound.isplaying) {
             lgsound.stopLoginSound();  // 停止登录音效播放
         }
-
         // 如果有其他需要清理的资源，可以在这里做
         // 例如数据库连接、文件操作等
-
         Platform.exit();  // 退出 JavaFX 应用
         System.exit(0);   // 强制退出程序，确保 JVM 退出
     }
-
-
-
     public static void showLoginUI() {
+        lgsound = new LoginSoundThread();
         Platform.runLater(() -> {
             primaryStage.setTitle("LOGIN");
 
@@ -87,13 +83,6 @@ public class App extends Application {
             Button loginButton = new Button();
             loginButton.getStyleClass().add("button");
             loginButton.setText("LOGIN");
-
-
-
-
-
-
-
             loginButton.setOnAction(e -> {
                 username = usernameField.getText();
                 String password = passwordField.getText();
@@ -359,12 +348,9 @@ public class App extends Application {
 
     // 定义 gameEnd 方法
     public static void gameEnd(String username, int score) throws SQLException {
-
-
         Manager sqlmanager = new Manager();
         int stateofupdate = sqlmanager.userUpdateScore(username, score);
         App.showGameEndUI(username, score, stateofupdate);
-
     }
 
 
