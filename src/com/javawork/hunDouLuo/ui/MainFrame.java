@@ -73,6 +73,8 @@ import java.util.Random;
    private volatile boolean running = true; // 标志位
    public static String username;
 
+   private boolean paused = false;
+
    public MainFrame()
    {
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
@@ -99,7 +101,7 @@ import java.util.Random;
        public void keyTyped(KeyEvent e)
        {
          if (KeyEvent.getKeyText(e.getKeyChar()).equals("Esc"))
-           System.exit(0);
+           paused = !paused;
        }
  
        public void keyReleased(KeyEvent e)
@@ -344,10 +346,8 @@ import java.util.Random;
        this.boss = new Boss(new FloatPoint(this.backgroundSizeOfWidth / 6 + this.mapPosition, 70.0F));
      }
    }
- 
-   public void run()
-   {
 
+   public void run() {
      try {
        Thread.sleep(2000L);
      } catch (InterruptedException e) {
@@ -356,45 +356,66 @@ import java.util.Random;
      setVisible(true);
 
      while (running) {
-       repaint(0, 0, 720, this.backgroundSizeOfHeight);
-       try {
-         Thread.sleep(1000 / FPS);
-       } catch (InterruptedException e) {
-         e.printStackTrace();
-       }
-       heroMove();
-       checkHeroIsDropping();
-       heroDeathCheck();
-       setEnemyVisibility();
-       enemysMove();
-       enemysDeathCheck();
-       enemyShotControl();
-       if ((this.hero.position.x >= 880.0F) && (this.hero.position.x <= 950.0F) && (this.hero.position.y >= 20.0F) && (this.hero.position.y <= 111.0F))
-         this.passedFirstMovingGrassLand = true;
-       if ((this.hero.position.x >= 1170.0F) && (this.hero.position.y >= 20.0F) && (this.hero.position.y <= 111.0F)) {
-         this.passedSecondMovingGrassLand = true;
-       }
-       if ((this.hero.state == 5) && (this.heroNum > 0)) {
-         heroBirth();
-       }
-       if(this.heroNum==0){
-         running = false;
-       }
-       if ((this.hero.position.x > 3260.0F) && (this.mapPosition < 3328.0F) && (this.playPreBossStoneSound)) {
-         this.showBossScene = true;
-         this.playPreBossStoneSound = false;
-        this.preBossBgSoundThread = new PreBossBackgroundSoundThread();
-        new Thread(this.preBossBgSoundThread).start();
+       if (!paused) {  // 如果没有暂停，执行游戏更新逻辑
+         repaint(0, 0, 720, this.backgroundSizeOfHeight);
 
-        this.gameStartBgSoundThread.stopBackgroundMusic();
-        this.gameStartBgSoundThread.playSound = false;
+         try {
+           Thread.sleep(1000 / FPS);  // 控制帧率
+         } catch (InterruptedException e) {
+           e.printStackTrace();
+         }
+
+         // 更新游戏状态
+         heroMove();
+         checkHeroIsDropping();
+         heroDeathCheck();
+         setEnemyVisibility();
+         enemysMove();
+         enemysDeathCheck();
+         enemyShotControl();
+
+         if ((this.hero.position.x >= 880.0F) && (this.hero.position.x <= 950.0F) && (this.hero.position.y >= 20.0F) && (this.hero.position.y <= 111.0F))
+           this.passedFirstMovingGrassLand = true;
+         if ((this.hero.position.x >= 1170.0F) && (this.hero.position.y >= 20.0F) && (this.hero.position.y <= 111.0F)) {
+           this.passedSecondMovingGrassLand = true;
+         }
+
+         if ((this.hero.state == 5) && (this.heroNum > 0)) {
+           heroBirth();
+         }
+
+         if (this.heroNum == 0) {
+           running = false;
+         }
+
+         if ((this.hero.position.x > 3260.0F) && (this.mapPosition < 3328.0F) && (this.playPreBossStoneSound)) {
+           this.showBossScene = true;
+           this.playPreBossStoneSound = false;
+           this.preBossBgSoundThread = new PreBossBackgroundSoundThread();
+           new Thread(this.preBossBgSoundThread).start();
+
+           this.gameStartBgSoundThread.stopBackgroundMusic();
+           this.gameStartBgSoundThread.playSound = false;
+         }
+
+         if (this.preBossBattle)
+           playPreBossBattle(this.big);
        }
-       if (this.preBossBattle)
-          playPreBossBattle(this.big);
+
+       // 暂停时不执行任何更新
+       else {
+         try {
+           Thread.sleep(100);  // 如果暂停，稍等再继续循环
+         } catch (InterruptedException e) {
+           e.printStackTrace();
+         }
+       }
      }
+
      gameStartBgSoundThread.stopBackgroundMusic();
      dispose();
    }
+
    private void enemyShotControl()
    {
      for (int i = 0; i < this.enemys.size(); i++)

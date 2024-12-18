@@ -49,6 +49,18 @@ public class App extends Application {
 
     }
 
+    @Override
+    public void stop() {
+        System.out.println("Stop method is called!");  // 打印调试信息确认是否执行
+        // 停止其他资源
+        if (lgsound != null && lgsound.isplaying) {
+            lgsound.stopLoginSound();
+        }
+        Platform.exit();
+        System.exit(0);  // 强制退出
+    }
+
+
     public static void showLoginUI() {
         Platform.runLater(() -> {
             primaryStage.setTitle("LOGIN");
@@ -144,75 +156,75 @@ public class App extends Application {
     }
 
     public static void showRegisterUI() {
-             primaryStage.setTitle("ENROLL");
-            Label usernameLabel = new Label("USERNAME:");
-            usernameLabel.getStyleClass().add("label1");
-            TextField usernameField = new TextField();
-            usernameField.getStyleClass().add("field1");
-            // 创建密码标签和输入框
-            Label passwordLabel = new Label("PASSWORD:");
-            passwordLabel.getStyleClass().add("label1");
+        primaryStage.setTitle("ENROLL");
+        Label usernameLabel = new Label("USERNAME:");
+        usernameLabel.getStyleClass().add("label1");
+        TextField usernameField = new TextField();
+        usernameField.getStyleClass().add("field1");
+        // 创建密码标签和输入框
+        Label passwordLabel = new Label("PASSWORD:");
+        passwordLabel.getStyleClass().add("label1");
 
-            PasswordField passwordField = new PasswordField();
-            passwordField.getStyleClass().add("field1");
-            Button registerButton = new Button();
-            registerButton.getStyleClass().add("button");
+        PasswordField passwordField = new PasswordField();
+        passwordField.getStyleClass().add("field1");
+        Button registerButton = new Button();
+        registerButton.getStyleClass().add("button");
 
-            registerButton.setText("ENROLL");
+        registerButton.setText("ENROLL");
 
-            Button backButton = new Button("BACK");
-            backButton.getStyleClass().add("button");
+        Button backButton = new Button("BACK");
+        backButton.getStyleClass().add("button");
 
-            backButton.setOnAction(e -> {
-                showLoginUI();
-            });
+        backButton.setOnAction(e -> {
+            showLoginUI();
+        });
 
 
-            registerButton.setOnAction(e -> {
-                String username = usernameField.getText();
-                String password = passwordField.getText();
-                try {
-                    handleRegister(username, password);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-            addHoverAnimation(registerButton);
-            addHoverAnimation(backButton);
+        registerButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            try {
+                handleRegister(username, password);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        addHoverAnimation(registerButton);
+        addHoverAnimation(backButton);
 
-            AnchorPane anchorPane = new AnchorPane();
-            // 创建布局并添加控件
-            AnchorPane.setTopAnchor(usernameLabel, 315.0);
-            AnchorPane.setLeftAnchor(usernameLabel, 200.0);
-            AnchorPane.setRightAnchor(usernameLabel, 200.0);
+        AnchorPane anchorPane = new AnchorPane();
+        // 创建布局并添加控件
+        AnchorPane.setTopAnchor(usernameLabel, 315.0);
+        AnchorPane.setLeftAnchor(usernameLabel, 200.0);
+        AnchorPane.setRightAnchor(usernameLabel, 200.0);
 
-            AnchorPane.setTopAnchor(usernameField, 340.0);
-            AnchorPane.setLeftAnchor(usernameField, 350.0);
-            AnchorPane.setRightAnchor(usernameField, 350.0);
+        AnchorPane.setTopAnchor(usernameField, 340.0);
+        AnchorPane.setLeftAnchor(usernameField, 350.0);
+        AnchorPane.setRightAnchor(usernameField, 350.0);
 
-            AnchorPane.setTopAnchor(passwordLabel, 385.0);
-            AnchorPane.setLeftAnchor(passwordLabel, 200.0);
-            AnchorPane.setRightAnchor(passwordLabel, 200.0);
+        AnchorPane.setTopAnchor(passwordLabel, 385.0);
+        AnchorPane.setLeftAnchor(passwordLabel, 200.0);
+        AnchorPane.setRightAnchor(passwordLabel, 200.0);
 
-            AnchorPane.setTopAnchor(passwordField, 410.0);
-            AnchorPane.setLeftAnchor(passwordField, 350.0);
-            AnchorPane.setRightAnchor(passwordField, 350.0);
+        AnchorPane.setTopAnchor(passwordField, 410.0);
+        AnchorPane.setLeftAnchor(passwordField, 350.0);
+        AnchorPane.setRightAnchor(passwordField, 350.0);
 
-            AnchorPane.setTopAnchor(registerButton, 470.0);
-            AnchorPane.setLeftAnchor(registerButton, 200.0);
-            AnchorPane.setRightAnchor(registerButton, 200.0);
+        AnchorPane.setTopAnchor(registerButton, 470.0);
+        AnchorPane.setLeftAnchor(registerButton, 200.0);
+        AnchorPane.setRightAnchor(registerButton, 200.0);
 
-            AnchorPane.setTopAnchor(backButton, 530.0);
-            AnchorPane.setLeftAnchor(backButton, 200.0);
-            AnchorPane.setRightAnchor(backButton, 200.0);
+        AnchorPane.setTopAnchor(backButton, 530.0);
+        AnchorPane.setLeftAnchor(backButton, 200.0);
+        AnchorPane.setRightAnchor(backButton, 200.0);
 
-            anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField,  registerButton, backButton);
+        anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField,  registerButton, backButton);
 
-            // 创建场景并设置到舞台
-            Scene scene = new Scene(anchorPane, 900, 672);
-            scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
-            primaryStage.setScene(scene);
-            primaryStage.show();
+        // 创建场景并设置到舞台
+        Scene scene = new Scene(anchorPane, 900, 672);
+        scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm());
+        primaryStage.setScene(scene);
+        primaryStage.show();
 
     }
 
@@ -342,7 +354,7 @@ public class App extends Application {
 
         Manager sqlmanager = new Manager();
         int stateofupdate = sqlmanager.userUpdateScore(username, score);
-            App.showGameEndUI(username, score, stateofupdate);
+        App.showGameEndUI(username, score, stateofupdate);
 
     }
 }
