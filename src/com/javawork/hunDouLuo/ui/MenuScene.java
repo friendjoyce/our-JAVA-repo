@@ -56,7 +56,7 @@ public class MenuScene {
 
         // 按钮事件绑定
         startGameButton.setOnAction(e -> startGame());
-        exitButton.setOnAction(e -> stage.close());
+        exitButton.setOnAction(e -> System.exit(0));
         rankButton.setOnAction(e -> {
             try {
                 showRankingUI();

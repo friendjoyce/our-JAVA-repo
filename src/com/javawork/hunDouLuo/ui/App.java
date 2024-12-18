@@ -37,28 +37,37 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) throws SQLException {
-        lgsound = new LoginSoundThread();
         App.primaryStage = primaryStage;
         primaryStage.setTitle("LOGIN");
         showLoginUI();
 
+        // 在窗口关闭时调用 stop 方法
+        primaryStage.setOnCloseRequest(event -> {
+            System.out.println("Window closed");
+            stop();  // 手动调用 stop 方法
+        });
+
         // 创建第二个窗口，但不显示
         gameEndStage = new Stage();
         gameEndStage.setTitle("Game Over");
-
-
     }
+
 
     @Override
     public void stop() {
         System.out.println("Stop method is called!");  // 打印调试信息确认是否执行
-        // 停止其他资源
+        // 停止其他资源和线程
         if (lgsound != null && lgsound.isplaying) {
-            lgsound.stopLoginSound();
+            lgsound.stopLoginSound();  // 停止登录音效播放
         }
-        Platform.exit();
-        System.exit(0);  // 强制退出
+
+        // 如果有其他需要清理的资源，可以在这里做
+        // 例如数据库连接、文件操作等
+
+        Platform.exit();  // 退出 JavaFX 应用
+        System.exit(0);   // 强制退出程序，确保 JVM 退出
     }
+
 
 
     public static void showLoginUI() {
@@ -357,4 +366,6 @@ public class App extends Application {
         App.showGameEndUI(username, score, stateofupdate);
 
     }
+
+
 }
