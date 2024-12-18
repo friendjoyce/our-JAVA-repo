@@ -7,6 +7,8 @@ import sshWeb.SSHService;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -83,6 +85,14 @@ import java.util.Random;
      setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
      setLocation((this.screenSize.width - getWidth()) / 2, 20);
      setVisible(false);
+
+     this.addWindowListener(new WindowAdapter() {
+       @Override
+       public void windowClosing(WindowEvent e) {
+         // 在窗口关闭时退出程序
+         System.exit(0);
+       }
+     });
  
      addKeyListener(new KeyListener()
      {
@@ -214,7 +224,7 @@ import java.util.Random;
        this.enemys.add(enemy4[i]);
      }
    }
- 
+
    public void paint(Graphics g)
    {
      super.paint(g);
@@ -222,20 +232,20 @@ import java.util.Random;
      g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
      g.setColor(Color.BLACK);
      g.setFont(new Font(null, 1, 30));
-     g.drawString("操作控制", 740, 100);
- 
-     g.setFont(new Font(null, 1, 20));
-     g.drawString("W 上, S 下", 740, 150);
-     g.drawString("A 左, D 右", 745, 180);
-     g.drawString("J 开枪", 745, 210);
-     g.drawString("K 跳跃", 745, 240);
-     g.drawString("切枪:", 745, 270);
-     g.drawString("1、2、3、4", 745, 300);
-     g.drawString("Esc 退出", 745, 330);
-     g.setFont(new Font(null, 1, 16));
-     g.drawString("JAVA大作业DEMO", 780, 560);
+//     g.drawString("操作控制", 740, 100);
+//
+//     g.setFont(new Font(null, 1, 20));
+//     g.drawString("W 上, S 下", 740, 150);
+//     g.drawString("A 左, D 右", 745, 180);
+//     g.drawString("J 开枪", 745, 210);
+//     g.drawString("K 跳跃", 745, 240);
+//     g.drawString("切枪:", 745, 270);
+//     g.drawString("1、2、3、4", 745, 300);
+//     g.drawString("Esc 退出", 745, 330);
+//     g.setFont(new Font(null, 1, 16));
+//     g.drawString("JAVA大作业DEMO", 780, 560);
    }
- 
+
    public void update(Graphics g)
    {
      Graphics2D g2 = (Graphics2D)g;
@@ -263,7 +273,7 @@ import java.util.Random;
      if (this.bossChildren.size() > 0) {
        playBossChildrenAnimation(this.big);
      }
- 
+
      if (!this.hero.visible) {
        this.big.setComposite(this.alphaComposite);
      }
@@ -277,7 +287,7 @@ import java.util.Random;
      g2.fillRect(0, 0, getWidth(), getHeight());
      g2.drawImage(this.bi, (int)this.bgPosition.x, (int)this.bgPosition.y, (int)(this.backgroundSizeOfWidth / 1.3D), (int)(this.backgroundSizeOfHeight / 1.3D), this);
    }
- 
+
    private void playBossChildrenAnimation(Graphics2D big2)
    {
      for (int i = 0; i < this.bossChildren.size(); i++) {
@@ -1241,7 +1251,7 @@ import java.util.Random;
    private void moveForwardToRight()
    {
      if ((this.hero.state != 4) && (this.hero.state != 5))
-       if ((this.hero.position.x - this.mapPosition < this.backgroundSizeOfWidth / 6.0F) || (this.mapPosition >= this.sceneWidth - this.backgroundSizeOfWidth / 3)) {
+       if ((this.hero. position.x - this.mapPosition < this.backgroundSizeOfWidth / 6.0F) || (this.mapPosition >= this.sceneWidth - this.backgroundSizeOfWidth / 3)) {
          if (this.hero.position.x - this.mapPosition < (this.backgroundSizeOfWidth - 20.0F) / 3.0F)
            this.hero.position.x += this.walkSpeed;
        }
