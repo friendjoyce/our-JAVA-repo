@@ -494,6 +494,7 @@ import java.util.Random;
        if ((e.position.x > this.mapPosition) && (e.position.x < this.mapPosition + this.backgroundSizeOfWidth / 3) && 
          (!e.visible)) {
          e.visible = true;
+         //不是射击怪
          if (e.type != 4) {
            e.state = 1;
            e.towardsLeft = true;
@@ -531,6 +532,7 @@ import java.util.Random;
              this.hero.deathEventType = 2;
              SoundUtils.playSound("audios/death.wav");
            }
+           //怪死
            else {
              e.state = 4;
            }
@@ -674,6 +676,7 @@ import java.util.Random;
    {
      for (int i = 0; i < this.enemys.size(); i++) {
        SimpleEnemy enemy = (SimpleEnemy)this.enemys.get(i);
+       //掉落
        if ((!isGrassLand(enemy.position.x, enemy.position.y + 2.0F)) && (!enemy.jumping)) {
          enemy.position.y += 2.0F;
        }
@@ -778,6 +781,7 @@ import java.util.Random;
                  enemy.position.x += this.walkSpeed;
                }
                else if ((isGrassLand(enemy.position.x, enemy.position.y + 2.0F)) && (!isGrassLand(enemy.position.x - 3.0F, enemy.position.y + 2.0F))) {
+                 //会判断跳跃的智能怪
                  if (isASafetyJump(new FloatPoint(enemy.position.x, enemy.position.y), enemy.direction)) {
                    enemy.state = 2;
                    enemy.jumping = true;
@@ -828,7 +832,7 @@ import java.util.Random;
          enemy.state = 4;
      }
    }
- 
+ //针对会移动的草
    private boolean isASafetyJump(FloatPoint position, int direction)
    {
      if (direction == 2) {
@@ -1020,7 +1024,6 @@ import java.util.Random;
              score++;
            }
            this.heroBullets.remove(j);
- 
            break;
          }
        }
