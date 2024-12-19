@@ -7,6 +7,7 @@
  {
    public FloatPoint position;
    public int direction;
+   // 用于控制动画帧的变量，影响动画的播放速度
    private static int ANIMATION_TEMP = 0;
    private static float JUMP_HEIGHT = 0.0F;
    public boolean jumping = false;
@@ -19,10 +20,13 @@
    public int state = 0;
    public Weapon weapon;
    public int deathEventType;
+   //width: 英雄的宽度，用于绘制图像。
+   //height: 英雄的高度，用于绘制图像。
    public int width;
    public int height;
+   //用于控制英雄可见性的临时计数器。
    int visibleTemp = 0;
- 
+ // 计数器，控制一些动画的帧数
    int temp = 0;
  
    public Hero()
@@ -188,6 +192,7 @@
      else if (this.direction == 7) {
        g.drawImage(Imgs.WALKANDSHOT7, (int)((this.position.x - mapPosition) * 3.0F) - 45, (int)(this.position.y * 3.0F) - 100, (int)((this.position.x - mapPosition) * 3.0F) + 45, (int)(this.position.y * 3.0F), (3 - temp) * 90, 0, (3 - temp) * 90 + 90, 100, null);
      }
+     //每一帧加一, 当大于30时,重置为0,每组10帧(temp,10帧一个动作
      if (++ANIMATION_TEMP > 30)
        ANIMATION_TEMP = 0;
    }
@@ -204,6 +209,7 @@
      if (++ANIMATION_TEMP > 21) {
        ANIMATION_TEMP = 0;
      }
+     //可以改跳跃高度
      if ((JUMP_HEIGHT < 30.0F) && (!this.jumpFinished)) {
        JUMP_HEIGHT += 1.0F;
        this.position.y -= 2.0F;

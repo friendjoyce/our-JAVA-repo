@@ -46,7 +46,7 @@ import java.util.Random;
    private boolean upDown = false;
    private boolean downDown = false;
    private boolean jumpDown = false;
-   private int heroNum = 100;
+   private int heroNum = 1;
    private List<SimpleEnemy> enemys = new ArrayList();
    private boolean showBossScene = false;
    private Boss boss;
@@ -513,6 +513,7 @@ import java.util.Random;
            (b.position.y > this.hero.position.y - this.hero.height / 3) && (b.position.y < this.hero.position.y) && 
            (this.hero.visible)) {
            this.hero.state = 4;
+           //射死
            this.hero.deathEventType = 0;
            SoundUtils.playSound("audios/death.wav");
            this.enemyBullets.remove(i);
@@ -526,6 +527,7 @@ import java.util.Random;
            (this.hero.position.y > e.position.y - 26.0F) && (this.hero.position.y < e.position.y + this.hero.height / 3)) {
            if (this.hero.visible) {
              this.hero.state = 4;
+             //撞死
              this.hero.deathEventType = 2;
              SoundUtils.playSound("audios/death.wav");
            }
@@ -649,6 +651,7 @@ import java.util.Random;
          {
            if (this.hero.visible) {
              this.hero.state = 4;
+             //掉死
              this.hero.deathEventType = 1;
              SoundUtils.playSound("audios/death.wav");
            }
@@ -1139,7 +1142,7 @@ import java.util.Random;
          else if (this.hero.towardsRight) {
            this.hero.direction = 2;
          }
- 
+
        }
        else if (this.hero.jumping) {
          if (this.upDown) {
@@ -1191,7 +1194,7 @@ import java.util.Random;
            this.hero.towardsRight = true;
            moveForwardToRight();
          }
- 
+
        }
        else if ((this.leftDown) && (!this.showBossScene)) {
          if ((this.jumpDown) && (isGrassLand(this.hero.position.x, this.hero.position.y + 1.0F)))
@@ -1229,7 +1232,9 @@ import java.util.Random;
              this.hero.position.x -= this.walkSpeed;
          }
        }
+       //如果按下了右方向键且不在“Boss战场景”中，英雄朝右移动，状态变为 state = 2（行走状态），并调用 moveForwardToRight() 来实现右移动。
        else if ((this.rightDown) && (!this.showBossScene)) {
+         //下一步有没有草
          if ((this.jumpDown) && (isGrassLand(this.hero.position.x, this.hero.position.y + 1.0F))) {
            this.hero.direction = 2;
            this.hero.state = 2;
@@ -1296,23 +1301,25 @@ import java.util.Random;
          this.hero.jumpFinished = false;
        }
    }
- 
+
+   //只在非boss战时触发
    private void moveForwardToRight()
    {
-     if ((this.hero.state != 4) && (this.hero.state != 5))
-       if ((this.hero. position.x - this.mapPosition < this.backgroundSizeOfWidth / 6.0F) || (this.mapPosition >= this.sceneWidth - this.backgroundSizeOfWidth / 3)) {
+     if ((this.hero.state != 4) && (this.hero.state != 5)) {
+       //backgroundSizeOfWidth是实实在在的像素,要有单位换算/3后/2,其实就是地图的中间
+         //3028-3328走一半是抖过去的
+       if ((this.hero.position.x - this.mapPosition < this.backgroundSizeOfWidth / 6.0F) || (this.mapPosition >= this.sceneWidth - this.backgroundSizeOfWidth / 3)) {
          if (this.hero.position.x - this.mapPosition < (this.backgroundSizeOfWidth - 20.0F) / 3.0F)
            this.hero.position.x += this.walkSpeed;
-       }
-       else {
+       } else {
          if (this.mapPosition < this.sceneWidth - this.backgroundSizeOfWidth / 3) {
            this.mapPosition += this.walkSpeed;
-         }
-         else {
+         } else {
            this.mapPosition = (this.sceneWidth - this.backgroundSizeOfWidth / 3.0F);
          }
          this.hero.position.x = (this.backgroundSizeOfWidth / 6.0F + this.mapPosition);
        }
+     }
    }
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
