@@ -493,6 +493,7 @@ import java.util.Random;
    private void playPreBossBattleAnimation(Graphics2D g)
    {
      this.sceneWidth = 3628;
+     //这个时候变3628,3628-3328=300最后领域
      if (this.mapPosition < 3328.0F)
      {
        FloatPoint tmp22_19 = this.scenePosition; tmp22_19.y = (float)(tmp22_19.y + 6.0D * Math.sin(this.delta++));
@@ -589,6 +590,7 @@ import java.util.Random;
        GrassLand movingGrassLand = new GrassLand(new FloatPoint(24.0F, 110.0F), 1);
        movingGrassLand.movingDirection = 3;
        this.grassLands[(this.grassLands.length - 2)] = movingGrassLand;
+       //没跳过去,map回过来
        this.mapPosition = 680.0F;
        this.hero = new Hero(new FloatPoint(700.0F, 0.0F), 2);
      }
@@ -632,6 +634,7 @@ import java.util.Random;
  
    private FloatPoint findBirthPlace()
    {
+     //防止重生到河里
      if ((this.passedFirstMovingGrassLand) && (this.grassLands[(this.grassLands.length - 2)].position.x * 32.0F + 32.0F > this.mapPosition)) {
        for (int j = (int)(this.grassLands[(this.grassLands.length - 2)].position.x * 32.0F + 50.0F); j < this.backgroundSizeOfWidth / 3 + this.mapPosition; j += 32) {
          for (int i = 0; i < this.backgroundSizeOfHeight / 3; i += 3) {
@@ -1042,12 +1045,14 @@ import java.util.Random;
          this.enemys.remove(i);
        }
      }
+     //两层循环，一个循环是heroBullets，一个循环是enemys,判断血量
      for (int i = 0; i < this.enemys.size(); i++) {
        SimpleEnemy e = (SimpleEnemy)this.enemys.get(i);
        for (int j = 0; j < this.heroBullets.size(); j++) {
          Bullet b = (Bullet)this.heroBullets.get(j);
          if (e.touchHeroBulletCheck(b)) {
            if ((e.state == 4) || (e.state == 5)) break;
+           //伤害根据子弹的energy决定
            e.beShotted(b.energy);
            if(e.isShottedByHero){
              score++;
@@ -1061,6 +1066,7 @@ import java.util.Random;
        for (int i = 0; i < this.heroBullets.size(); i++) {
          Bullet b = (Bullet)this.heroBullets.get(i);
          if (this.boss.touchHeroBulletCheck(b)) {
+           //伤害根据子弹的energy决定
            this.boss.beShotted(b.energy);
            this.heroBullets.remove(i);
          }
