@@ -289,7 +289,6 @@ public class App extends Application {
     }
     public static void showGameEndUI(String username, int score, int state) {
         Platform.runLater(() -> {
-
             Label label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score);
 
             if (state == 3) {
@@ -301,7 +300,6 @@ public class App extends Application {
             label.setStyle("-fx-font-size:24;-fx-text-fill:rgb(34,158,241);");
             StackPane root = new StackPane();
             root.getChildren().add(label);
-
             Scene scene = new Scene(root, 400, 300);
             gameEndStage.setScene(scene);
             gameEndStage.show();
