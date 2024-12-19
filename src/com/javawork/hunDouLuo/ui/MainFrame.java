@@ -23,6 +23,9 @@ import java.util.Random;
    private Graphics2D big;
    AlphaComposite alphaComposite = AlphaComposite.getInstance(3, 0.5F);
    AlphaComposite alphaComposite2 = AlphaComposite.getInstance(3, 1.0F);
+   //mapPosition 指定了背景或地图的横向偏移值（X 方向）在整个场景中，坐标原点通常位于左上角（0, 0），但 mapPosition 的引入使得绘制内容会根据当前视角动态调整。
+   //position 和 mapposition 之差表示角色相对于视野窗口的偏移，然后乘以每个格子的像素大小，得出角色绘制的 x 坐标。
+   //坐标轴方向：X 轴：从左向右为正方向。Y 轴：从上向下为正方向。
    public float mapPosition = 0.0F;
    private FloatPoint bgPosition = new FloatPoint(20.0F, 90.0F);
    private FloatPoint scenePosition = new FloatPoint(0.0F, 0.0F);
@@ -358,6 +361,7 @@ import java.util.Random;
 
    private void playPreBossBattle(Graphics2D big2)
    {
+     //timeCont 累计帧数，控制敌人的生成频率
      this.timeCont += 1;
      if ((this.timeCont > 120) && (this.simpleEnemyNum < 200) && (this.enemys.size() < 3)) {
        SimpleEnemy e = new SimpleEnemy(new FloatPoint(this.random.nextInt(280) + 10 + this.mapPosition, this.random.nextInt(140)), 2 + 4 * this.random.nextInt(2), 1);
@@ -366,7 +370,7 @@ import java.util.Random;
        this.enemys.add(e);
        this.simpleEnemyNum += 1;
      }
-     else if ((this.simpleEnemyNum >= 0) && (this.enemys.size() < 1)) {
+     else if ((this.simpleEnemyNum >= 20) && (this.enemys.size() < 1)) {
        this.preBossBattle = false;
        this.bossBattle = true;
        this.boss = new Boss(new FloatPoint(this.backgroundSizeOfWidth / 6 + this.mapPosition, 70.0F));
@@ -380,7 +384,6 @@ import java.util.Random;
        e.printStackTrace();
      }
      setVisible(true);
-
      while (running) {
        if (!paused) {  // 如果没有暂停，执行游戏更新逻辑
          repaint(0, 0, 720, this.backgroundSizeOfHeight);
@@ -390,7 +393,6 @@ import java.util.Random;
          } catch (InterruptedException e) {
            e.printStackTrace();
          }
-
          // 更新游戏状态
          heroMove();
          checkHeroIsDropping();
@@ -410,7 +412,7 @@ import java.util.Random;
            heroBirth();
          }
 
-         if (this.heroNum == 0) {
+         if (this.heroNum <= 0) {
            running = false;
          }
 
@@ -1315,7 +1317,7 @@ import java.util.Random;
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
-     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
+//     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
      Platform.setImplicitExit(false);
      username = App.gameStartfx();
 //     Thread game = new Thread(new MainFrame());

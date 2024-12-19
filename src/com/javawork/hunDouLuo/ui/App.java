@@ -51,14 +51,14 @@ public class App extends Application {
         gameEndStage = new Stage();
         gameEndStage.setTitle("Game Over");
     }
-
-
     @Override
     public void stop() {
         System.out.println("Stop method is called!");  // 打印调试信息确认是否执行
         // 停止其他资源和线程
         if (lgsound != null && lgsound.isplaying) {
-            lgsound.stopLoginSound();  // 停止登录音效播放
+            lgsound.isplaying = false;
+            lgsound.stopLoginSound();
+            // 停止登录音效播放
         }
         // 如果有其他需要清理的资源，可以在这里做
         // 例如数据库连接、文件操作等
@@ -298,8 +298,6 @@ public class App extends Application {
             if (state == 1) {
                 label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score + "\ncongratulation! your personal best born!");
             }
-
-
             label.setStyle("-fx-font-size:24;-fx-text-fill:rgb(34,158,241);");
             StackPane root = new StackPane();
             root.getChildren().add(label);
@@ -321,7 +319,6 @@ public class App extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
     // 定义 gameStartfx 方法
     public static String gameStartfx() {
         new Thread(() -> Application.launch(App.class)).start();
@@ -332,7 +329,6 @@ public class App extends Application {
                 e.printStackTrace();
             }
         }
-
         Platform.runLater(() -> App.showLoginUI());
         // 等待login成功
         while (!App.loginSuccessful) {
@@ -342,16 +338,13 @@ public class App extends Application {
                 e.printStackTrace();
             }
         }
-
         return App.getUsername();
     }
-
     // 定义 gameEnd 方法
     public static void gameEnd(String username, int score) throws SQLException {
         Manager sqlmanager = new Manager();
         int stateofupdate = sqlmanager.userUpdateScore(username, score);
         App.showGameEndUI(username, score, stateofupdate);
+        System.exit(0);
     }
-
-
 }

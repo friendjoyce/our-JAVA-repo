@@ -12,7 +12,7 @@
      super(type);
      this.type = type;
    }
- 
+ //根据方向直接为子弹赋予固定的速度和初始位置。
    public List<Bullet> shot(FloatPoint position, int direction, int num) {
      List list = new ArrayList(1);
      switch (direction) {
@@ -43,7 +43,7 @@
  
      return list;
    }
- 
+ //根据目标点动态计算子弹的速度分量，确保子弹能够朝目标移动
    public List<Bullet> shot(FloatPoint position, FloatPoint target, int direction, int num) {
      List list = new ArrayList(1);
      if ((target.x > position.x) && (target.y < position.y)) {

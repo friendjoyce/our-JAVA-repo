@@ -1,7 +1,7 @@
  package com.javawork.hunDouLuo.ui;
  
  import java.awt.Graphics2D;
- 
+ //扩散弹
  public class ShotBullet extends Bullet
  {
    public FloatPoint position;

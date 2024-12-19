@@ -1,7 +1,7 @@
  package com.javawork.hunDouLuo.ui;
  
  import java.awt.Graphics2D;
- 
+ //强力弹
  public class StrongBullet extends Bullet
  {
    public FloatPoint position;

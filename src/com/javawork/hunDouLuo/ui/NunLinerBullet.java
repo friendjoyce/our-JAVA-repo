@@ -1,23 +1,24 @@
  package com.javawork.hunDouLuo.ui;
  
  import java.awt.Graphics2D;
- 
+ //螺旋弹
  public class NunLinerBullet extends Bullet
  {
    public FloatPoint position;
+   //子弹的绝对坐标，用于计算螺旋中心
    public FloatPoint absolutePosition;
    public static boolean isAlive = true;
    private int direction = 2;
    public int type;
    public float size = 10.0F;
+   //子弹的直线运动速度，控制基本移动方向
    private float speedX = 6.0F;
    private float speedY = 6.0F;
    public static int energy = 80;
- 
    int temp = 0;
    int theta = 0;
+   //螺旋半径，控制轨迹大小
    int R = 13;
- 
    public NunLinerBullet(FloatPoint position, int direction, int type, float speedX, float speedY)
    {
      super(position, isAlive, energy);
@@ -28,7 +29,6 @@
      this.absolutePosition = new FloatPoint(position.x, position.y);
      this.direction = direction;
    }
- 
    public void drawBubblet(Graphics2D g, float mapPosition)
    {
      if (isAlive) {

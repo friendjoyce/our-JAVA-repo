@@ -2,7 +2,7 @@
  
  import java.awt.Color;
  import java.awt.Graphics2D;
- 
+ //普通弹
  public class SimpleBullet extends Bullet
  {
    public FloatPoint position;
