@@ -10,6 +10,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +36,7 @@ import java.util.Random;
    private int backgroundSizeOfHeight = 672;
    private Hero hero;
    private static int FPS = 60;
-   private int walkSpeed = 1;
+   private int walkSpeed = 10;
    private GrassLand[] grassLands = new GrassLand[41];
    private Random random = new Random();
    Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -73,13 +75,17 @@ import java.util.Random;
    boolean stopBossBgSound = true;
 
    static int score = 0;
-   private volatile boolean running = true; // 标志位
+   public volatile boolean running = true; // 标志位
    public static String username;
-
+   victoryframe victoryFrame;
+   Victorysoundthread  victorySoundThread;
+   boolean playvictorySound=false;
    private boolean paused = false;
 
    public MainFrame()
-   {
+   { this.setVisible(true);
+     this.victorySoundThread=new Victorysoundthread ();
+     this.victoryFrame=new victoryframe(this.getLocationOnScreen().x,this.getLocationOnScreen().y,this);
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
      new Thread(this.gameStartBgSoundThread).start();
      this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
@@ -156,7 +162,7 @@ import java.util.Random;
        }
      });
    }
- 
+
    private void initEnemys()
    {
      //0-3都是那个只会跑的,不过有的会跳,有的会之间冲过来,4是只站立的射击怪
@@ -329,7 +335,7 @@ import java.util.Random;
    private void playBossBattleAnimation(Graphics2D g)
    {
      this.boss.drawBoss(g, this.mapPosition);
-     if ((this.boss != null) && (this.boss.isAlive))
+     if ((this.boss != null) && (this.boss.isAlive)){
        if (this.boss.life > this.boss.defaultLife / 3) {
          //BOSS子弹跟踪  :屏幕位置 = 物体绝对位置 - mapPosition
          this.enemyBullets.addAll(this.boss.simpleShot(new FloatPoint(this.hero.position.x + 0.001F, this.hero.position.y + 0.001F), 1));
@@ -356,6 +362,9 @@ import java.util.Random;
            this.addEnemy2 = false;
          }
        }
+     }else if(this.boss!=null){
+       victory(this.big);
+     }
    }
 
 
@@ -363,20 +372,45 @@ import java.util.Random;
    {
      //timeCont 累计帧数，控制敌人的生成频率
      this.timeCont += 1;
-     if ((this.timeCont > 120) && (this.simpleEnemyNum < 200) && (this.enemys.size() < 3)) {
+     if ((this.timeCont > 120) && (this.simpleEnemyNum < 2) && (this.enemys.size() < 3)) {
        SimpleEnemy e = new SimpleEnemy(new FloatPoint(this.random.nextInt(280) + 10 + this.mapPosition, this.random.nextInt(140)), 2 + 4 * this.random.nextInt(2), 1);
        e.visible = true;
        e.state = 1;
        this.enemys.add(e);
        this.simpleEnemyNum += 1;
      }
-     else if ((this.simpleEnemyNum >= 20) && (this.enemys.size() < 1)) {
+     else if ((this.simpleEnemyNum >= 2) && (this.enemys.size() < 1)) {
        this.preBossBattle = false;
        this.bossBattle = true;
        this.boss = new Boss(new FloatPoint(this.backgroundSizeOfWidth / 6 + this.mapPosition, 70.0F));
      }
    }
-
+   public void victory(Graphics2D g){
+//     Button backmenu=new Button();
+     if(playvictorySound){new Thread(victorySoundThread).start();playvictorySound=false;}
+     try {
+       // 构建字体文件路径：与src平级的font目录下
+       File fontFile = new File("font\\ThaleahFat.ttf");
+       // 加载字体文件
+       if(!fontFile.exists()){
+         System.err.println("字体文件不存在: ");
+       }
+       Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+       // 设置字体大小并应用到Graphics2D
+       Font scaledFont = customFont.deriveFont(125f);
+       g.setFont(scaledFont);
+     } catch (FontFormatException e) {
+       System.err.println("字体文件格式错误: " + e.getMessage());
+     } catch (IOException e){
+       System.err.println("加载字体文件失败: " + e.getMessage());
+     }
+     bossBgSound.stopBackgroundMusic();
+     bossBgSound.playSound=false;
+     g.setColor(Color.YELLOW);
+     g.drawString("YOU WIN!", 265, 250);
+     //设置exitgame的按钮字体大小
+     victoryFrame.setVisible(true);
+   }
    public void run() {
      try {
        Thread.sleep(2000L);
@@ -387,7 +421,6 @@ import java.util.Random;
      while (running) {
        if (!paused) {  // 如果没有暂停，执行游戏更新逻辑
          repaint(0, 0, 720, this.backgroundSizeOfHeight);
-
          try {
            Thread.sleep(1000 / FPS);  // 控制帧率
          } catch (InterruptedException e) {
@@ -439,7 +472,6 @@ import java.util.Random;
          }
        }
      }
-
      gameStartBgSoundThread.stopBackgroundMusic();
      dispose();
    }
@@ -514,7 +546,6 @@ import java.util.Random;
            (b.position.y > this.hero.position.y - this.hero.height / 3) && (b.position.y < this.hero.position.y) && 
            (this.hero.visible)) {
            this.hero.state = 4;
-           //射死
            this.hero.deathEventType = 0;
            SoundUtils.playSound("audios/death.wav");
            this.enemyBullets.remove(i);
@@ -528,7 +559,6 @@ import java.util.Random;
            (this.hero.position.y > e.position.y - 26.0F) && (this.hero.position.y < e.position.y + this.hero.height / 3)) {
            if (this.hero.visible) {
              this.hero.state = 4;
-             //撞死
              this.hero.deathEventType = 2;
              SoundUtils.playSound("audios/death.wav");
            }
@@ -585,7 +615,7 @@ import java.util.Random;
        this.hero = new Hero(findBirthPlace(), finBirthDirection());
      }
      this.hero.state = 0;
-     this.heroNum -= 1;
+     this.heroNum = 100;
      this.leftDown = false;
      this.rightDown = false;
      this.upDown = false;
@@ -653,7 +683,6 @@ import java.util.Random;
          {
            if (this.hero.visible) {
              this.hero.state = 4;
-             //掉死
              this.hero.deathEventType = 1;
              SoundUtils.playSound("audios/death.wav");
            }
@@ -1145,7 +1174,7 @@ import java.util.Random;
          else if (this.hero.towardsRight) {
            this.hero.direction = 2;
          }
-
+ 
        }
        else if (this.hero.jumping) {
          if (this.upDown) {
@@ -1197,7 +1226,7 @@ import java.util.Random;
            this.hero.towardsRight = true;
            moveForwardToRight();
          }
-
+ 
        }
        else if ((this.leftDown) && (!this.showBossScene)) {
          if ((this.jumpDown) && (isGrassLand(this.hero.position.x, this.hero.position.y + 1.0F)))
@@ -1235,9 +1264,7 @@ import java.util.Random;
              this.hero.position.x -= this.walkSpeed;
          }
        }
-       //如果按下了右方向键且不在“Boss战场景”中，英雄朝右移动，状态变为 state = 2（行走状态），并调用 moveForwardToRight() 来实现右移动。
        else if ((this.rightDown) && (!this.showBossScene)) {
-         //下一步有没有草
          if ((this.jumpDown) && (isGrassLand(this.hero.position.x, this.hero.position.y + 1.0F))) {
            this.hero.direction = 2;
            this.hero.state = 2;
@@ -1304,32 +1331,32 @@ import java.util.Random;
          this.hero.jumpFinished = false;
        }
    }
-
-   //只在非boss战时触发
+ 
    private void moveForwardToRight()
    {
-     if ((this.hero.state != 4) && (this.hero.state != 5)) {
-       //backgroundSizeOfWidth是实实在在的像素,要有单位换算/3后/2,其实就是地图的中间
-         //3028-3328走一半是抖过去的
-       if ((this.hero.position.x - this.mapPosition < this.backgroundSizeOfWidth / 6.0F) || (this.mapPosition >= this.sceneWidth - this.backgroundSizeOfWidth / 3)) {
+     if ((this.hero.state != 4) && (this.hero.state != 5))
+       if ((this.hero. position.x - this.mapPosition < this.backgroundSizeOfWidth / 6.0F) || (this.mapPosition >= this.sceneWidth - this.backgroundSizeOfWidth / 3)) {
          if (this.hero.position.x - this.mapPosition < (this.backgroundSizeOfWidth - 20.0F) / 3.0F)
            this.hero.position.x += this.walkSpeed;
-       } else {
+       }
+       else {
          if (this.mapPosition < this.sceneWidth - this.backgroundSizeOfWidth / 3) {
            this.mapPosition += this.walkSpeed;
-         } else {
+         }
+         else {
            this.mapPosition = (this.sceneWidth - this.backgroundSizeOfWidth / 3.0F);
          }
          this.hero.position.x = (this.backgroundSizeOfWidth / 6.0F + this.mapPosition);
        }
-     }
    }
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
 //     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
      Platform.setImplicitExit(false);
-     username = App.gameStartfx();
+//       MainFrame frame= new MainFrame();
+//       new Thread(frame).start();
+        username = App.gameStartfx();
 //     Thread game = new Thread(new MainFrame());
 //     game.start();
 //     try {

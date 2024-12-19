@@ -289,18 +289,36 @@ public class App extends Application {
     }
     public static void showGameEndUI(String username, int score, int state) {
         Platform.runLater(() -> {
-            Label label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score);
+
+            Label label = new Label(username + "!!!!!!!!" + "\nYUOR SCORE IS :" + score);
 
             if (state == 3) {
-                label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score + "\ndidn't break your best \n need more effort!!!!!!!!!!!!!!!");
+                label = new Label(username + "!!!!!!!!" + "\nYOUR SCORE IS:" + score + "\nDIDN'T BREAK YOUR BEST \n NEED MORE EFFORT!!!!!!!!!!!!!!!");
             }
             if (state == 1) {
-                label = new Label(username + "!!!!!!!!" + "\nyour score is :" + score + "\ncongratulation! your personal best born!");
+                label = new Label(username + "!!!!!!!!" + "\nYOUR SCORE IS:" + score + "\nCONGRATULATIONS!YOUR PERSONAL BEST BIRTH!");
             }
-            label.setStyle("-fx-font-size:24;-fx-text-fill:rgb(34,158,241);");
-            StackPane root = new StackPane();
-            root.getChildren().add(label);
+            label.getStyleClass().add("label1");
+            label.setPrefSize(100,100);
+            label.setWrapText(true); // 允许换行
+            label.setMaxWidth(300); // 设置最大宽度
+
+// 创建确认按钮
+            Button confirmButton = new Button("CONFIRM");
+            confirmButton.setOnAction(e -> {
+                // 确认按钮点击事件处理逻辑
+                gameEndStage.close(); // 关闭游戏结束窗口
+                System.exit(0);
+            });
+// 使用 VBox 垂直排列 label 和 button
+            VBox vbox = new VBox(10, label, confirmButton);
+            vbox.setPrefSize(100,200);
+            VBox.setMargin(label, new Insets(50, 0, 0, 0)); // 上边距为 50，左右下边距为 0
+            vbox.setAlignment(Pos.CENTER); // 设置对齐方式为居中
+            StackPane root = new StackPane(vbox);
             Scene scene = new Scene(root, 400, 300);
+            scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm()); // 加载 CSS 文件
+
             gameEndStage.setScene(scene);
             gameEndStage.show();
         });
@@ -340,9 +358,10 @@ public class App extends Application {
     }
     // 定义 gameEnd 方法
     public static void gameEnd(String username, int score) throws SQLException {
+        System.out.println("GAMEEND");
         Manager sqlmanager = new Manager();
         int stateofupdate = sqlmanager.userUpdateScore(username, score);
         App.showGameEndUI(username, score, stateofupdate);
-        System.exit(0);
+//        System.exit(0);
     }
 }
