@@ -8,7 +8,7 @@
  {
    public FloatPoint position;
    public int direction;
-   public int defaultLife = 20000;
+   public int defaultLife = 200;
    public int life = this.defaultLife;
    public boolean isAlive = true;
    public int state = 0;
@@ -51,6 +51,7 @@
      }
      else if (this.state == 5)
        drawDiedBossAnimation(g, mapPosition);
+
    }
  
    private void drawDiedBossAnimation(Graphics2D g, float mapPosition)
@@ -71,7 +72,7 @@
      this.position.x = ((float)(3.0D * Math.sin(this.flyingTemp)) + this.diePosition.x);
      this.position.y = ((float)(3.0D * Math.sin(this.flyingTemp)) + this.diePosition.y);
      this.flyingTemp += 1.0F;
-     this.temp += 1;
+     this.temp += 2;
  
      if (this.temp < 290) {
        this.bombTemp = ((this.temp - 180) / 10);
@@ -120,6 +121,7 @@
      else {
        this.state = 5;
        this.isAlive = false;
+
      }
    }
  
@@ -127,9 +129,8 @@
      SoundUtils.playSound("audios/beshotted.wav");
      this.life -= damage;
      if ((this.life <= 0) && (this.playVictorySound)) {
-       SoundUtils.playSound("audios/victory.mid");
        this.state = 4;
-       this.playVictorySound = false;
+       this.playVictorySound = true;
        this.diePosition = new FloatPoint(this.position.x, this.position.y);
      }
    }
