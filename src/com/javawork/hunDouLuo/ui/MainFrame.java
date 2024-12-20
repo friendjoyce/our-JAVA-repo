@@ -10,8 +10,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +23,6 @@ import java.util.Random;
    private Graphics2D big;
    AlphaComposite alphaComposite = AlphaComposite.getInstance(3, 0.5F);
    AlphaComposite alphaComposite2 = AlphaComposite.getInstance(3, 1.0F);
-   //mapPosition 指定了背景或地图的横向偏移值（X 方向）在整个场景中，坐标原点通常位于左上角（0, 0），但 mapPosition 的引入使得绘制内容会根据当前视角动态调整。
-   //position 和 mapposition 之差表示角色相对于视野窗口的偏移，然后乘以每个格子的像素大小，得出角色绘制的 x 坐标。
-   //坐标轴方向：X 轴：从左向右为正方向。Y 轴：从上向下为正方向。
    public float mapPosition = 0.0F;
    private FloatPoint bgPosition = new FloatPoint(20.0F, 90.0F);
    private FloatPoint scenePosition = new FloatPoint(0.0F, 0.0F);
@@ -36,7 +31,7 @@ import java.util.Random;
    private int backgroundSizeOfHeight = 672;
    private Hero hero;
    private static int FPS = 60;
-   private int walkSpeed = 10;
+   private int walkSpeed = 1;
    private GrassLand[] grassLands = new GrassLand[41];
    private Random random = new Random();
    Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -75,17 +70,15 @@ import java.util.Random;
    boolean stopBossBgSound = true;
 
    static int score = 0;
-   public volatile boolean running = true; // 标志位
+   private volatile boolean running = true; // 标志位
    public static String username;
-   victoryframe victoryFrame;
-   Victorysoundthread  victorySoundThread;
-   boolean playvictorySound=false;
+
    private boolean paused = false;
 
    public MainFrame()
-   { this.setVisible(true);
-     this.victorySoundThread=new Victorysoundthread ();
-     this.victoryFrame=new victoryframe(this.getLocationOnScreen().x,this.getLocationOnScreen().y,this);
+   {
+     this.setFocusable(true);
+     this.requestFocusInWindow();  // 强制获取焦点
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
      new Thread(this.gameStartBgSoundThread).start();
      this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
@@ -94,8 +87,8 @@ import java.util.Random;
      initGrassLands();
      initEnemys();
      setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
-     setLocation((this.screenSize.width - getWidth()) / 2, 20);
-     setVisible(false);
+
+     setLocationRelativeTo(null);  // 居中显示窗口
 
      this.addWindowListener(new WindowAdapter() {
        @Override
@@ -104,17 +97,21 @@ import java.util.Random;
          System.exit(0);
        }
      });
- 
+
      addKeyListener(new KeyListener()
      {
        public void keyTyped(KeyEvent e)
        {
-         if (KeyEvent.getKeyText(e.getKeyChar()).equals("Esc"))
-           paused = !paused;
+
        }
- 
+
        public void keyReleased(KeyEvent e)
        {
+         if (KeyEvent.getKeyText(e.getKeyCode()).equals("Esc")) {
+           paused = !paused;  // 切换暂停状态
+           System.out.println("Paused: " + paused);
+           repaint();  // 刷新界面，确保暂停菜单显示
+         }
          MainFrame.this.setKeyStateWhenKeyReleased(e);
          if ((MainFrame.this.hero.state != 4) && (MainFrame.this.hero.state != 5)) {
            if (KeyEvent.getKeyText(e.getKeyCode()).equals("J")) {
@@ -124,14 +121,14 @@ import java.util.Random;
              MainFrame.this.hero.canDrop = true;
          }
        }
- 
+
        public void keyPressed(KeyEvent e)
        {
          int type = e.getKeyCode() - 48;
          if ((type > 0) && (type < 5)) {
            MainFrame.this.hero.weapon = WeaponFactory.getWeapon(type);
          }
- 
+
          MainFrame.this.setKeyStateWhenKeyPressed(e);
          if ((MainFrame.this.hero.state != 4) && (MainFrame.this.hero.state != 5)) {
            if (KeyEvent.getKeyText(e.getKeyCode()).equals("J")) {
@@ -149,7 +146,7 @@ import java.util.Random;
                  MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(10 - MainFrame.this.heroBullets.size()));
                }
              }
- 
+
              MainFrame.this.hero.canShot = false;
            }
            if ((KeyEvent.getKeyText(e.getKeyCode()).equals("K")||KeyEvent.getKeyText(e.getKeyCode()).equals(" ")) &&
@@ -162,7 +159,7 @@ import java.util.Random;
        }
      });
    }
-
+ 
    private void initEnemys()
    {
      //0-3都是那个只会跑的,不过有的会跳,有的会之间冲过来,4是只站立的射击怪
@@ -236,108 +233,97 @@ import java.util.Random;
      }
    }
 
-   //paint适合静态场景
-   public void paint(Graphics g)
-   {
-     //调用父类的paint函数,清除画布内容
-     super.paint(g);
-     g.setColor(Color.GRAY);
-     g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
+   public void paint(Graphics g) {
+     super.paint(g);  // 确保调用父类的 paint 方法
+     // 游戏继续时，绘制游戏内容
      g.setColor(Color.BLACK);
      g.setFont(new Font(null, 1, 30));
-//     g.drawString("操作控制", 740, 100);
-//
-//     g.setFont(new Font(null, 1, 20));
-//     g.drawString("W 上, S 下", 740, 150);
-//     g.drawString("A 左, D 右", 745, 180);
-//     g.drawString("J 开枪", 745, 210);
-//     g.drawString("K 跳跃", 745, 240);
-//     g.drawString("切枪:", 745, 270);
-//     g.drawString("1、2、3、4", 745, 300);
-//     g.drawString("Esc 退出", 745, 330);
-//     g.setFont(new Font(null, 1, 16));
-//     g.drawString("JAVA大作业DEMO", 780, 560);
+     // 其他游戏内容的绘制代码（背景、敌人、玩家等）
    }
-   //update适合动态的场景使用
-   public void update(Graphics g)
-   {
-     //将 Graphics 对象转换为 Graphics2D，以便使用更多绘图功能。
-     Graphics2D g2 = (Graphics2D)g;
-     //如果是第一次调用，初始化画布资源：
+
+
+
+   public void update(Graphics g) {
+     if (paused) {
+       // 绘制暂停菜单（半透明黑色背景 + 提示文字）
+       g.setColor(new Color(0, 0, 0, 128));  // 半透明黑色背景
+       g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
+
+       // 绘制暂停提示文字
+       g.setColor(Color.WHITE);
+       g.setFont(new Font("楷体", Font.BOLD, 40));
+       g.drawString("游戏已暂停", this.backgroundSizeOfWidth / 2 - 100, this.backgroundSizeOfHeight / 2 - 50);
+
+       // 绘制菜单选项
+       g.setFont(new Font("楷体", Font.PLAIN, 30));
+       g.drawString("按 'P' 继续游戏", this.backgroundSizeOfWidth / 2 - 120, this.backgroundSizeOfHeight / 2 + 10);
+       g.drawString("按 'Esc' 退出游戏", this.backgroundSizeOfWidth / 2 - 120, this.backgroundSizeOfHeight / 2 + 50);
+
+       // 退出函数，不绘制游戏内容
+       return;
+     }
+     Graphics2D g2 = (Graphics2D) g;
      if (this.firstTime) {
        Dimension dim = getSize();
        int w = dim.width;
        int h = dim.height;
        new Rectangle(dim);
-       //双缓冲的“双”：前缓冲：显示在屏幕上的画面。后缓冲：内存中的画布，用于准备下一帧内容。
-       //所有绘图操作都在后缓冲中完成。
-       //绘制完成后，将后缓冲的内容一次性复制到前缓冲（屏幕）。
-       //避免了直接在屏幕上多次绘图带来的闪烁现象。
-       this.bi = ((BufferedImage)createImage(w, h));
-       //BufferedImage 是内存中的一块画布，用于存储最终的图像。
-       //它是绘图内容的容器。
+       this.bi = (BufferedImage) createImage(getWidth(), getHeight());
        this.big = this.bi.createGraphics();
-       //this.big：操作后缓冲的绘图工具，是从 this.bi.createGraphics() 得到的 Graphics2D 对象。
-       //它负责在后缓冲（this.bi）上绘制所有内容。
        this.firstTime = false;
        this.big.setStroke(new BasicStroke(1.0F));
      }
-     //绘制背景图（Imgs.BACKGROUND01），动态调整背景位置和显示的大小。
-     //目标区域的左上角 (dx1, dy1)决定图像绘制在屏幕的起始位置。目标区域的右下角 (dx2, dy2)。决定图像在屏幕上的宽度和高度。后面四个是源图像的左上和右下,672其实是带着一点放大的背景,原图片也就224
-     //这个时候this.big还没绘制完成
-     //绘制顺序严格按照代码书写的顺序：
-     //背景 → NPC → 主角 → 子弹等。
-     //后绘制的内容会覆盖先绘制的内容。
-     this.big.drawImage(Imgs.BACKGROUND01, (int)this.scenePosition.x, (int)this.scenePosition.y, this.backgroundSizeOfWidth, (int)this.scenePosition.y + 672, (int)this.mapPosition, 0, (int)this.mapPosition + this.backgroundSizeOfWidth / 3, 224, null);
+
+     this.big.drawImage(Imgs.BACKGROUND01, (int) this.scenePosition.x, (int) this.scenePosition.y, this.backgroundSizeOfWidth, (int) this.scenePosition.y + 900, (int) this.mapPosition, 0, (int) this.mapPosition + this.backgroundSizeOfWidth / 3, 300, null);
      drawNPC(this.big);
+
      if (this.showBossScene) {
        playPreBossBattleAnimation(this.big);
      }
+
      if (this.bossBattle) {
        playBossBattleAnimation(this.big);
      }
+
      for (int i = 0; i < this.enemys.size(); i++) {
-       ((SimpleEnemy)this.enemys.get(i)).drawPlayer(this.big, this.mapPosition);
+       ((SimpleEnemy) this.enemys.get(i)).drawPlayer(this.big, this.mapPosition);
      }
+
      if (this.bossChildren.size() > 0) {
        playBossChildrenAnimation(this.big);
      }
 
      if (!this.hero.visible) {
-       //设置是否可见(可被攻击)
        this.big.setComposite(this.alphaComposite);
      }
-     //draw 参数一直是 this.big,this.big 是从 BufferedImage 创建的 Graphics2D 对象,避免直接在屏幕上绘制，减少屏幕闪烁。
-     //所有绘制操作先在内存画布中完成，最后统一渲染到屏幕。通过 BufferedImage，可以保存整个画面状态，方便后续操作（如缩放、重绘等）
      this.hero.drawPlayer(this.big, this.mapPosition);
      this.big.setComposite(this.alphaComposite2);
+
      drawHeroBullets(this.big);
      drawEnemyBullets(this.big);
+
      this.big.setColor(Color.WHITE);
      this.big.setFont(new Font(null, 1, 28));
-     g2.setColor(Color.GRAY);
-     g2.fillRect(0, 0, getWidth(), getHeight());
-     //this.big 是 Graphics2D，用于操作后缓冲。
-     //g2 是 Graphics2D，用于操作屏幕画布。
-     g2.drawImage(this.bi, (int)this.bgPosition.x, (int)this.bgPosition.y, (int)(this.backgroundSizeOfWidth / 1.3D), (int)(this.backgroundSizeOfHeight / 1.3D), this);
+     g2.setColor(Color.BLACK); // 设置背景颜色
+     g2.fillRect(0, 0, getWidth(), getHeight()); // 清除整个窗口
+     g2.drawImage(this.bi, (int) this.bgPosition.x, (int) this.bgPosition.y, (int) (this.backgroundSizeOfWidth / 1.3D), (int) (this.backgroundSizeOfHeight / 1.3D), this);
    }
+
 
    private void playBossChildrenAnimation(Graphics2D big2)
    {
      for (int i = 0; i < this.bossChildren.size(); i++) {
        ((BossChild)this.bossChildren.get(i)).position.y += 0.1F;
        ((BossChild)this.bossChildren.get(i)).drawBossChild(big2, this.mapPosition);
-       //子弹bu跟踪  :屏幕位置 = 物体绝对位置 - mapPosition
        this.enemyBullets.addAll(((BossChild)this.bossChildren.get(i)).simpleShot(new FloatPoint(this.hero.position.x, this.hero.position.y), 1));
      }
    }
-
+ 
    private void playBossBattleAnimation(Graphics2D g)
    {
      this.boss.drawBoss(g, this.mapPosition);
-     if ((this.boss != null) && (this.boss.isAlive)){
+     if ((this.boss != null) && (this.boss.isAlive))
        if (this.boss.life > this.boss.defaultLife / 3) {
-         //BOSS子弹跟踪  :屏幕位置 = 物体绝对位置 - mapPosition
          this.enemyBullets.addAll(this.boss.simpleShot(new FloatPoint(this.hero.position.x + 0.001F, this.hero.position.y + 0.001F), 1));
        }
        else if (this.boss.life > this.boss.defaultLife / 6) {
@@ -362,55 +348,25 @@ import java.util.Random;
            this.addEnemy2 = false;
          }
        }
-     }else if(this.boss!=null){
-       victory(this.big);
-     }
    }
-
-
+ 
    private void playPreBossBattle(Graphics2D big2)
    {
-     //timeCont 累计帧数，控制敌人的生成频率
      this.timeCont += 1;
-     if ((this.timeCont > 120) && (this.simpleEnemyNum < 2) && (this.enemys.size() < 3)) {
+     if ((this.timeCont > 120) && (this.simpleEnemyNum < 200) && (this.enemys.size() < 3)) {
        SimpleEnemy e = new SimpleEnemy(new FloatPoint(this.random.nextInt(280) + 10 + this.mapPosition, this.random.nextInt(140)), 2 + 4 * this.random.nextInt(2), 1);
        e.visible = true;
        e.state = 1;
        this.enemys.add(e);
        this.simpleEnemyNum += 1;
      }
-     else if ((this.simpleEnemyNum >= 2) && (this.enemys.size() < 1)) {
+     else if ((this.simpleEnemyNum >= 0) && (this.enemys.size() < 1)) {
        this.preBossBattle = false;
        this.bossBattle = true;
        this.boss = new Boss(new FloatPoint(this.backgroundSizeOfWidth / 6 + this.mapPosition, 70.0F));
      }
    }
-   public void victory(Graphics2D g){
-//     Button backmenu=new Button();
-     if(playvictorySound){new Thread(victorySoundThread).start();playvictorySound=false;}
-     try {
-       // 构建字体文件路径：与src平级的font目录下
-       File fontFile = new File("font\\ThaleahFat.ttf");
-       // 加载字体文件
-       if(!fontFile.exists()){
-         System.err.println("字体文件不存在: ");
-       }
-       Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
-       // 设置字体大小并应用到Graphics2D
-       Font scaledFont = customFont.deriveFont(125f);
-       g.setFont(scaledFont);
-     } catch (FontFormatException e) {
-       System.err.println("字体文件格式错误: " + e.getMessage());
-     } catch (IOException e){
-       System.err.println("加载字体文件失败: " + e.getMessage());
-     }
-     bossBgSound.stopBackgroundMusic();
-     bossBgSound.playSound=false;
-     g.setColor(Color.YELLOW);
-     g.drawString("YOU WIN!", 265, 250);
-     //设置exitgame的按钮字体大小
-     victoryFrame.setVisible(true);
-   }
+
    public void run() {
      try {
        Thread.sleep(2000L);
@@ -418,14 +374,17 @@ import java.util.Random;
        e.printStackTrace();
      }
      setVisible(true);
+
      while (running) {
        if (!paused) {  // 如果没有暂停，执行游戏更新逻辑
          repaint(0, 0, 720, this.backgroundSizeOfHeight);
+
          try {
            Thread.sleep(1000 / FPS);  // 控制帧率
          } catch (InterruptedException e) {
            e.printStackTrace();
          }
+
          // 更新游戏状态
          heroMove();
          checkHeroIsDropping();
@@ -445,7 +404,7 @@ import java.util.Random;
            heroBirth();
          }
 
-         if (this.heroNum <= 0) {
+         if (this.heroNum == 0) {
            running = false;
          }
 
@@ -472,6 +431,7 @@ import java.util.Random;
          }
        }
      }
+
      gameStartBgSoundThread.stopBackgroundMusic();
      dispose();
    }
@@ -493,7 +453,6 @@ import java.util.Random;
    private void playPreBossBattleAnimation(Graphics2D g)
    {
      this.sceneWidth = 3628;
-     //这个时候变3628,3628-3328=300最后领域
      if (this.mapPosition < 3328.0F)
      {
        FloatPoint tmp22_19 = this.scenePosition; tmp22_19.y = (float)(tmp22_19.y + 6.0D * Math.sin(this.delta++));
@@ -527,7 +486,6 @@ import java.util.Random;
        if ((e.position.x > this.mapPosition) && (e.position.x < this.mapPosition + this.backgroundSizeOfWidth / 3) && 
          (!e.visible)) {
          e.visible = true;
-         //不是射击怪
          if (e.type != 4) {
            e.state = 1;
            e.towardsLeft = true;
@@ -563,7 +521,6 @@ import java.util.Random;
              this.hero.deathEventType = 2;
              SoundUtils.playSound("audios/death.wav");
            }
-           //怪死
            else {
              e.state = 4;
            }
@@ -590,7 +547,6 @@ import java.util.Random;
        GrassLand movingGrassLand = new GrassLand(new FloatPoint(24.0F, 110.0F), 1);
        movingGrassLand.movingDirection = 3;
        this.grassLands[(this.grassLands.length - 2)] = movingGrassLand;
-       //没跳过去,map回过来
        this.mapPosition = 680.0F;
        this.hero = new Hero(new FloatPoint(700.0F, 0.0F), 2);
      }
@@ -617,7 +573,7 @@ import java.util.Random;
        this.hero = new Hero(findBirthPlace(), finBirthDirection());
      }
      this.hero.state = 0;
-     this.heroNum = 100;
+     this.heroNum -= 1;
      this.leftDown = false;
      this.rightDown = false;
      this.upDown = false;
@@ -634,7 +590,6 @@ import java.util.Random;
  
    private FloatPoint findBirthPlace()
    {
-     //防止重生到河里
      if ((this.passedFirstMovingGrassLand) && (this.grassLands[(this.grassLands.length - 2)].position.x * 32.0F + 32.0F > this.mapPosition)) {
        for (int j = (int)(this.grassLands[(this.grassLands.length - 2)].position.x * 32.0F + 50.0F); j < this.backgroundSizeOfWidth / 3 + this.mapPosition; j += 32) {
          for (int i = 0; i < this.backgroundSizeOfHeight / 3; i += 3) {
@@ -708,7 +663,6 @@ import java.util.Random;
    {
      for (int i = 0; i < this.enemys.size(); i++) {
        SimpleEnemy enemy = (SimpleEnemy)this.enemys.get(i);
-       //掉落
        if ((!isGrassLand(enemy.position.x, enemy.position.y + 2.0F)) && (!enemy.jumping)) {
          enemy.position.y += 2.0F;
        }
@@ -813,7 +767,6 @@ import java.util.Random;
                  enemy.position.x += this.walkSpeed;
                }
                else if ((isGrassLand(enemy.position.x, enemy.position.y + 2.0F)) && (!isGrassLand(enemy.position.x - 3.0F, enemy.position.y + 2.0F))) {
-                 //会判断跳跃的智能怪
                  if (isASafetyJump(new FloatPoint(enemy.position.x, enemy.position.y), enemy.direction)) {
                    enemy.state = 2;
                    enemy.jumping = true;
@@ -864,7 +817,7 @@ import java.util.Random;
          enemy.state = 4;
      }
    }
- //针对会移动的草
+ 
    private boolean isASafetyJump(FloatPoint position, int direction)
    {
      if (direction == 2) {
@@ -1045,19 +998,18 @@ import java.util.Random;
          this.enemys.remove(i);
        }
      }
-     //两层循环，一个循环是heroBullets，一个循环是enemys,判断血量
      for (int i = 0; i < this.enemys.size(); i++) {
        SimpleEnemy e = (SimpleEnemy)this.enemys.get(i);
        for (int j = 0; j < this.heroBullets.size(); j++) {
          Bullet b = (Bullet)this.heroBullets.get(j);
          if (e.touchHeroBulletCheck(b)) {
            if ((e.state == 4) || (e.state == 5)) break;
-           //伤害根据子弹的energy决定
            e.beShotted(b.energy);
            if(e.isShottedByHero){
              score++;
            }
            this.heroBullets.remove(j);
+ 
            break;
          }
        }
@@ -1066,7 +1018,6 @@ import java.util.Random;
        for (int i = 0; i < this.heroBullets.size(); i++) {
          Bullet b = (Bullet)this.heroBullets.get(i);
          if (this.boss.touchHeroBulletCheck(b)) {
-           //伤害根据子弹的energy决定
            this.boss.beShotted(b.energy);
            this.heroBullets.remove(i);
          }
@@ -1358,11 +1309,9 @@ import java.util.Random;
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
-//     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
+     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
      Platform.setImplicitExit(false);
-//       MainFrame frame= new MainFrame();
-//       new Thread(frame).start();
-        username = App.gameStartfx();
+     username = App.gameStartfx();
 //     Thread game = new Thread(new MainFrame());
 //     game.start();
 //     try {
