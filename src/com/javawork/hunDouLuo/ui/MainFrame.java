@@ -18,6 +18,7 @@ import java.util.Random;
  public class MainFrame extends Frame
    implements Runnable
  {
+
    private boolean firstTime = true;
    private BufferedImage bi;
    private Graphics2D big;
@@ -26,7 +27,7 @@ import java.util.Random;
    public float mapPosition = 0.0F;
    private FloatPoint bgPosition = new FloatPoint(20.0F, 90.0F);
    private FloatPoint scenePosition = new FloatPoint(0.0F, 0.0F);
-   private int sceneWidth = 3328;
+   private int sceneWidth = 900;
    private int backgroundSizeOfWidth = 900;
    private int backgroundSizeOfHeight = 672;
    private Hero hero;
@@ -86,7 +87,9 @@ import java.util.Random;
      this.enemyBullets = new ArrayList();
      initGrassLands();
      initEnemys();
-     setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
+     this.setPreferredSize(new Dimension(900, 672)); // 固定内容区域的尺寸
+     this.pack();                                   // 调整窗口大小以适配内容区域
+     this.setResizable(false);                     // 禁止用户手动拉伸窗口
 
      setLocationRelativeTo(null);  // 居中显示窗口
 
@@ -302,7 +305,7 @@ import java.util.Random;
      drawHeroBullets(this.big);
      drawEnemyBullets(this.big);
 
-     this.big.setColor(Color.WHITE);
+     this.big.setColor(Color.BLACK);
      this.big.setFont(new Font(null, 1, 28));
      g2.setColor(Color.BLACK); // 设置背景颜色
      g2.fillRect(0, 0, getWidth(), getHeight()); // 清除整个窗口
