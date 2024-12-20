@@ -28,7 +28,7 @@ import static security.PasswordEncryption.hashPassword;
 
 public class App extends Application {
 
-    public static LoginSoundThread lgsound;
+    public static LoginSoundThread lgsound = new LoginSoundThread();
     private static Stage primaryStage;
     private static Stage gameEndStage;
 
@@ -43,6 +43,7 @@ public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws SQLException {
         App.primaryStage = primaryStage;
+        primaryStage.setResizable(false);
         primaryStage.setTitle("LOGIN");
         showLoginUI();
 
@@ -71,7 +72,7 @@ public class App extends Application {
         System.exit(0);   // 强制退出程序，确保 JVM 退出
     }
     public static void showLoginUI() {
-        lgsound = new LoginSoundThread();
+
         Platform.runLater(() -> {
             primaryStage.setTitle("LOGIN");
 
@@ -386,8 +387,24 @@ public class App extends Application {
         return App.getUsername();
     }
     // 定义 gameEnd 方法
-    public static void gameEnd(String username, int score) throws SQLException {
+    public static void gameEnd(String username, int score, String time) throws SQLException {
         System.out.println("GAMEEND");
+        System.out.println("username: " + username);
+        System.out.println("score: " + score);
+        System.out.println("time: " + time);
+        if(time.isEmpty()){
+            gameEnd(username, score);
+            return;
+        }
+
+        Manager sqlmanager = new Manager();
+        int stateofupdate = sqlmanager.userUpdateScore(username, score,time);
+        App.showGameEndUI(username, score, stateofupdate);
+//        System.exit(0);
+    }
+    public static void gameEnd(String username, int score) throws SQLException {
+        System.out.println("GAMEEND2");
+
         Manager sqlmanager = new Manager();
         int stateofupdate = sqlmanager.userUpdateScore(username, score);
         App.showGameEndUI(username, score, stateofupdate);

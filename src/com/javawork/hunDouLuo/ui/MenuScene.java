@@ -86,6 +86,12 @@ public class MenuScene {
         stage.setScene(scene);
     }
 
+    private static Line createVerticalSeparator() {
+        Line separator = new Line(0, 0, 0, 20);
+        separator.setStroke(Color.color(0.501, 0.3398, 0));
+        return separator;
+    }
+
     public void showRankingUI() throws SQLException {
         stage.setTitle("TOP 5 PLAYER");
 
@@ -94,12 +100,20 @@ public class MenuScene {
         header.setHgap(10);
 
         ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPrefWidth(140);
+        col1.setMinWidth(140);
         ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPrefWidth(10);
+        col2.setMinWidth(10);
         ColumnConstraints col3 = new ColumnConstraints();
-        col3.setPrefWidth(60);
-        header.getColumnConstraints().addAll(col1, col2, col3);
+        col3.setMinWidth(60);
+        ColumnConstraints col4 = new ColumnConstraints();
+        col4.setMinWidth(10);
+        ColumnConstraints col5 = new ColumnConstraints();
+        col5.setMinWidth(100); // 新增列的宽度
+        header.getColumnConstraints().addAll(col1, col2, col3, col4, col5);
+
+        RowConstraints rowConstraints = new RowConstraints();
+        rowConstraints.setPrefHeight(30); // 设置行高
+        header.getRowConstraints().add(rowConstraints);
 
         Label usernameHeader = new Label("USERNAME");
         usernameHeader.getStyleClass().add("label1");
@@ -107,9 +121,14 @@ public class MenuScene {
         Label scoreHeader = new Label("SCORE");
         scoreHeader.getStyleClass().add("label1");
 
+        Label timeHeader = new Label("TIME"); // 新增列的表头
+        timeHeader.getStyleClass().add("label1");
+
         header.add(usernameHeader, 0, 0);
         header.add(createVerticalSeparator(), 1, 0);
         header.add(scoreHeader, 2, 0);
+        header.add(createVerticalSeparator(), 3, 0); // 新增分隔符
+        header.add(timeHeader, 4, 0); // 新增列的表头
 
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(10));
@@ -125,7 +144,7 @@ public class MenuScene {
 
         Button backButton = new Button("BACK");
         backButton.getStyleClass().add("button");
-        backButton.setPrefSize(100,100.0*98/231);
+        backButton.setPrefSize(100, 100.0 * 98 / 231);
         addHoverAnimation(backButton);
 
         backButton.setOnAction(e -> {
@@ -147,12 +166,6 @@ public class MenuScene {
         stage.show();
     }
 
-    private static Line createVerticalSeparator() {
-        Line separator = new Line(0, 0, 0, 20);
-        separator.setStroke(Color.color(0.501, 0.3398, 0));
-        return separator;
-    }
-
     private static void loadUserData(VBox bottomBox) {
         Manager manager = new Manager();
         try {
@@ -163,19 +176,30 @@ public class MenuScene {
                 row.setHgap(10);
 
                 ColumnConstraints col1 = new ColumnConstraints();
-                col1.setPrefWidth(140);
+                col1.setMinWidth(140);
                 ColumnConstraints col2 = new ColumnConstraints();
-                col2.setPrefWidth(10);
+                col2.setMinWidth(10);
                 ColumnConstraints col3 = new ColumnConstraints();
-                col3.setPrefWidth(60);
-                row.getColumnConstraints().addAll(col1, col2, col3);
+                col3.setMinWidth(60);
+                ColumnConstraints col4 = new ColumnConstraints();
+                col4.setMinWidth(10);
+                ColumnConstraints col5 = new ColumnConstraints();
+                col5.setMinWidth(100); // 新增列的宽度
+                row.getColumnConstraints().addAll(col1, col2, col3, col4, col5);
+
+                RowConstraints rowConstraints = new RowConstraints();
+                rowConstraints.setPrefHeight(30); // 设置行高
+                row.getRowConstraints().add(rowConstraints);
 
                 Label usernameLabel = new Label(user.getUsername());
                 Label scoreLabel = new Label(String.valueOf(user.getScore()));
+                Label timeLabel = new Label(user.getTime()); // 新增列的内容
 
                 row.add(usernameLabel, 0, 0);
                 row.add(createVerticalSeparator(), 1, 0);
                 row.add(scoreLabel, 2, 0);
+                row.add(createVerticalSeparator(), 3, 0); // 新增分隔符
+                row.add(timeLabel, 4, 0); // 新增列的内容
 
                 bottomBox.getChildren().add(row);
             }
@@ -196,7 +220,7 @@ public class MenuScene {
         }
 
         try {
-            App.gameEnd(MainFrame.username, MainFrame.score);
+            App.gameEnd(MainFrame.username, MainFrame.score, MainFrame.timer.getElapsedTimeFormatted());
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

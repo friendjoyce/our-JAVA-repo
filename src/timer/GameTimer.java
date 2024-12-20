@@ -1,11 +1,11 @@
-package com.javawork.hunDouLuo.ui.timer;
+package timer;
 
 import java.time.Duration;
 import java.time.Instant;
 
 public class GameTimer {
-    private Instant startTime;
-    private Instant endTime;
+    private Instant startTime = null;
+    private Instant endTime = null;
 
     public void start() {
         startTime = Instant.now();
@@ -24,11 +24,15 @@ public class GameTimer {
     }
 
     public String getElapsedTimeFormatted() {
+        if(endTime == null) {
+            return "";
+        }
         long totalSeconds = getElapsedTimeInSeconds();
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         return String.format("%02d:%02d", minutes, seconds);
     }
+
 
 
 }

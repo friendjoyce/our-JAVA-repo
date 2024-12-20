@@ -3,10 +3,12 @@ package entity;
 public class User {
     private String username;
     private int score;
+    private String time;
 
-    public User(String username, int score) {
+    public User(String username, int score, String time) {
         this.username = username;
         this.score = score;
+        this.time = time;
     }
 
     public String getUsername() {
@@ -15,6 +17,9 @@ public class User {
 
     public int getScore() {
         return score;
+    }
+    public String getTime() {
+        return time;
     }
 
     @Override
