@@ -22,6 +22,9 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import static com.javawork.hunDouLuo.ui.MenuScene.addHoverAnimation;
+import static security.CryptoUtil.encrypt;
+import static security.PasswordEncryption.generateSalt;
+import static security.PasswordEncryption.hashPassword;
 
 public class App extends Application {
 
@@ -72,6 +75,7 @@ public class App extends Application {
         Platform.runLater(() -> {
             primaryStage.setTitle("LOGIN");
 
+
             Label usernameLabel = new Label("USERNAME:");
             usernameLabel.getStyleClass().add("label1");
             TextField usernameField = new TextField();
@@ -88,6 +92,8 @@ public class App extends Application {
             loginButton.setOnAction(e -> {
                 username = usernameField.getText();
                 String password = passwordField.getText();
+
+
                 try {
                     handleLogin(username, password);
                 } catch (SQLException ex) {
@@ -234,6 +240,8 @@ public class App extends Application {
     private static void handleLogin(String username, String password) throws SQLException {
         // 处理登录逻辑
         Manager sqlManager = new Manager();
+
+
         boolean findflag = sqlManager.userfind(username, password);
         if (findflag) {
             loginSuccessful = true;

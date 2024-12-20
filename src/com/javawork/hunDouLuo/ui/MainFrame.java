@@ -2,6 +2,8 @@
  
 // import sun.audio.AudioPlayer;
 
+import com.javawork.hunDouLuo.ui.timer.GameTimer;
+import com.sun.javafx.runtime.VersionInfo;
 import javafx.application.Platform;
 import sshWeb.SSHService;
 import java.awt.*;
@@ -78,6 +80,7 @@ import java.util.Random;
 
    public MainFrame()
    {
+
      this.setFocusable(true);
      this.requestFocusInWindow();  // 强制获取焦点
      this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
@@ -377,6 +380,8 @@ import java.util.Random;
        e.printStackTrace();
      }
      setVisible(true);
+     GameTimer gt = null;
+     gt.start();
 
      while (running) {
        if (!paused) {  // 如果没有暂停，执行游戏更新逻辑
@@ -409,6 +414,8 @@ import java.util.Random;
 
          if (this.heroNum == 0) {
            running = false;
+
+
          }
 
          if ((this.hero.position.x > 3260.0F) && (this.mapPosition < 3328.0F) && (this.playPreBossStoneSound)) {
@@ -1312,9 +1319,11 @@ import java.util.Random;
    public static void main(String[] args) {
      SSHService ssh = new SSHService();
      ssh.sshRun();
-     System.out.println(com.sun.javafx.runtime.VersionInfo.getRuntimeVersion());
+     System.out.println(VersionInfo.getRuntimeVersion());
      Platform.setImplicitExit(false);
      username = App.gameStartfx();
+
+
 //     Thread game = new Thread(new MainFrame());
 //     game.start();
 //     try {
