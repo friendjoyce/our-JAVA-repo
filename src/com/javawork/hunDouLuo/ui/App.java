@@ -18,6 +18,8 @@ import sqlOperator.Manager;
 
 import java.sql.SQLException;
 import java.util.List;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import static com.javawork.hunDouLuo.ui.MenuScene.addHoverAnimation;
 
@@ -289,19 +291,34 @@ public class App extends Application {
     }
     public static void showGameEndUI(String username, int score, int state) {
         Platform.runLater(() -> {
+            String baseMessage = username + "!!!!!!!!\nYOUR SCORE IS :";
+            String scorePart = String.valueOf(score);
 
-            Label label = new Label(username + "!!!!!!!!" + "\nYUOR SCORE IS :" + score);
+// 创建基础消息标签
+            Label messageLabel = new Label(baseMessage);
+            messageLabel.getStyleClass().add("label1");
+            messageLabel.setWrapText(true); // 允许换行
+            messageLabel.setMaxWidth(300); // 设置最大宽度
 
+// 创建分数标签并设置颜色为红色
+            Label scoreLabel = new Label(scorePart);
+            scoreLabel.setTextFill(Color.RED); // 设置文本颜色为红色
+            scoreLabel.getStyleClass().add("label2");
+            scoreLabel.setWrapText(true); // 允许换行
+            scoreLabel.setMaxWidth(300); // 设置最大宽度
+
+            String additionalMessage = "";
             if (state == 3) {
-                label = new Label(username + "!!!!!!!!" + "\nYOUR SCORE IS:" + score + "\nDIDN'T BREAK YOUR BEST \n NEED MORE EFFORT!!!!!!!!!!!!!!!");
+                additionalMessage = "\nDIDN'T BREAK YOUR BEST \n NEED MORE EFFORT!!!!!!!!!!!!!!!";
+            } else if (state == 1) {
+                additionalMessage = "\nCONGRATULATIONS! YOUR PERSONAL BEST BIRTH!";
             }
-            if (state == 1) {
-                label = new Label(username + "!!!!!!!!" + "\nYOUR SCORE IS:" + score + "\nCONGRATULATIONS!YOUR PERSONAL BEST BIRTH!");
-            }
-            label.getStyleClass().add("label1");
-            label.setPrefSize(100,100);
-            label.setWrapText(true); // 允许换行
-            label.setMaxWidth(300); // 设置最大宽度
+
+// 创建附加消息标签
+            Label additionalLabel = new Label(additionalMessage);
+            additionalLabel.getStyleClass().add("label1");
+            additionalLabel.setWrapText(true); // 允许换行
+            additionalLabel.setMaxWidth(300); // 设置最大宽度
 
 // 创建确认按钮
             Button confirmButton = new Button("CONFIRM");
@@ -310,17 +327,18 @@ public class App extends Application {
                 gameEndStage.close(); // 关闭游戏结束窗口
                 System.exit(0);
             });
+
 // 使用 VBox 垂直排列 label 和 button
-            VBox vbox = new VBox(10, label, confirmButton);
-            vbox.setPrefSize(100,200);
-            VBox.setMargin(label, new Insets(50, 0, 0, 0)); // 上边距为 50，左右下边距为 0
+            VBox vbox = new VBox(10, messageLabel, scoreLabel, additionalLabel, confirmButton);
+            vbox.setPrefSize(100, 200);
+            VBox.setMargin(messageLabel, new Insets(50, 0, 0, 0)); // 上边距为 50，左右下边距为 0
             vbox.setAlignment(Pos.CENTER); // 设置对齐方式为居中
             StackPane root = new StackPane(vbox);
-            Scene scene = new Scene(root, 400, 300);
+            Scene scene = new Scene(root, 800, 600);
             scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm()); // 加载 CSS 文件
-
             gameEndStage.setScene(scene);
             gameEndStage.show();
+
         });
     }
 
