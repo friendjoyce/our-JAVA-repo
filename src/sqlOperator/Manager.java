@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Properties;
 
 import static security.CryptoUtil.decrypt;
-
+import static security.PasswordEncryption.*;
 
 
 public class Manager {
@@ -42,7 +42,7 @@ public class Manager {
             String user = "root";
             String password = null;
             try {
-                password = decrypt(prop.getProperty("password"),prop.getProperty("key") );
+                password = decrypt(prop.getProperty("password2"),prop.getProperty("key") );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -105,16 +105,19 @@ public class Manager {
     }
 
     public boolean userfind(String name, String password) throws SQLException {
+        String sql1 = "select * from user where username=?;";
 
-        String sql = "select * from user where username=? and password=?;";
-        ps = conn.prepareStatement(sql);
+        ps = conn.prepareStatement(sql1);
         ps.setString(1, name);
-        ps.setString(2, password);
         rs = ps.executeQuery();
-        if(rs.next()) {
-            return true;
+        if(!rs.next()) {
+            return false;
         }
-        return false;
+        String salt =   rs.getString("salt");
+        String hashedpassword = rs.getString("password");
+        boolean flag = false;
+        flag = verifyPassword(password,salt,hashedpassword);
+        return flag;
 
 
     }
@@ -136,11 +139,15 @@ public class Manager {
         if(name.isEmpty()&&password.isEmpty()) {
             return false;
         }
-        String sql = "insert into user values(?,?,?);";
+        String salt = generateSalt();
+        String hashedpassword = hashPassword(password,salt);
+
+        String sql = "insert into user values(?,?,?,?);";
         ps = conn.prepareStatement(sql);
         ps.setString(1, name);
-        ps.setString(2, password);
+        ps.setString(2, hashedpassword);
         ps.setString(3, score + "");
+        ps.setString(4, salt);
         ps.executeUpdate();
         return true;
     }
