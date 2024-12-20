@@ -45,9 +45,9 @@ public class MenuScene {
         titleScaleEnter.play();
 
         // 创建菜单按钮
-        Button startGameButton = new Button("START GAME 开始游戏");
-        Button exitButton = new Button("EXIT 退出游戏");
-        Button rankButton = new Button("RANK 排名");
+        Button startGameButton = new Button("START GAME");
+        Button exitButton = new Button("EXIT GAME");
+        Button rankButton = new Button("RANK");
 
         // 应用动画到按钮
         addHoverAnimation(startGameButton);
@@ -66,17 +66,17 @@ public class MenuScene {
         });
 
         // 布局按钮
+        startGameButton.setPrefSize(100, 100.0*98/231);
         AnchorPane.setTopAnchor(startGameButton, 500.0);
-        AnchorPane.setLeftAnchor(startGameButton, 250.0);
-        AnchorPane.setRightAnchor(startGameButton, 250.0);
+        startGameButton.setLayoutX(400.0);
 
+        exitButton.setPrefSize(100, 100.0*98/231);
         AnchorPane.setTopAnchor(exitButton, 550.0);
-        AnchorPane.setLeftAnchor(exitButton, 250.0);
-        AnchorPane.setRightAnchor(exitButton, 250.0);
+        exitButton.setLayoutX(400.0);
 
+        rankButton.setPrefSize(100, 100.0*98/231);
         AnchorPane.setTopAnchor(rankButton, 600.0);
-        AnchorPane.setLeftAnchor(rankButton, 250.0);
-        AnchorPane.setRightAnchor(rankButton, 250.0);
+        rankButton.setLayoutX(400.0);
 
         pane.getChildren().addAll(title, startGameButton, exitButton, rankButton);
 
@@ -125,6 +125,7 @@ public class MenuScene {
 
         Button backButton = new Button("BACK");
         backButton.getStyleClass().add("button");
+        backButton.setPrefSize(100,100.0*98/231);
         addHoverAnimation(backButton);
 
         backButton.setOnAction(e -> {

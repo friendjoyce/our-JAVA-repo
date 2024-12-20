@@ -127,16 +127,13 @@ public class App extends Application {
             AnchorPane.setLeftAnchor(passwordField, 350.0);
             AnchorPane.setRightAnchor(passwordField, 350.0);
 
+            loginButton.setPrefSize(100, 100.0*98/231); // 设置宽高
             AnchorPane.setTopAnchor(loginButton, 450.0);
-            AnchorPane.setLeftAnchor(loginButton, 200.0);
-            AnchorPane.setRightAnchor(loginButton, 200.0);
+            loginButton.setLayoutX(400.0); // 直接指定 X 坐标
 
-            AnchorPane.setTopAnchor(registerButton, 490.0);
-            AnchorPane.setLeftAnchor(registerButton, 200.0);
-            AnchorPane.setRightAnchor(registerButton, 200.0);
-
-
-
+            registerButton.setPrefSize(100, 100.0*98/231); // 设置宽高
+            AnchorPane.setTopAnchor(registerButton, 500.0);
+            registerButton.setLayoutX(400.0); // 直接指定 X 坐标
 
             anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField, loginButton, registerButton);
 
@@ -168,10 +165,10 @@ public class App extends Application {
         PasswordField passwordField = new PasswordField();
         passwordField.getStyleClass().add("field1");
         Button registerButton = new Button();
+        registerButton.setPrefSize(300,100);
         registerButton.getStyleClass().add("button");
 
         registerButton.setText("ENROLL");
-
         Button backButton = new Button("BACK");
         backButton.getStyleClass().add("button");
 
@@ -210,13 +207,13 @@ public class App extends Application {
         AnchorPane.setLeftAnchor(passwordField, 350.0);
         AnchorPane.setRightAnchor(passwordField, 350.0);
 
-        AnchorPane.setTopAnchor(registerButton, 470.0);
-        AnchorPane.setLeftAnchor(registerButton, 200.0);
-        AnchorPane.setRightAnchor(registerButton, 200.0);
+        registerButton.setPrefSize(100, 100.0*98/231);
+        AnchorPane.setTopAnchor(registerButton, 500.0);
+        registerButton.setLayoutX(400.0);
 
-        AnchorPane.setTopAnchor(backButton, 530.0);
-        AnchorPane.setLeftAnchor(backButton, 200.0);
-        AnchorPane.setRightAnchor(backButton, 200.0);
+        backButton.setPrefSize(100, 100.0*98/231);
+        AnchorPane.setTopAnchor(backButton, 550.0);
+        backButton.setLayoutX(400.0);
 
         anchorPane.getChildren().addAll(usernameLabel, usernameField, passwordLabel, passwordField,  registerButton, backButton);
 
@@ -291,21 +288,23 @@ public class App extends Application {
     }
     public static void showGameEndUI(String username, int score, int state) {
         Platform.runLater(() -> {
-            String baseMessage = username + "!!!!!!!!\nYOUR SCORE IS :";
+            String baseMessage = username + "YOUR SCORE IS :";
             String scorePart = String.valueOf(score);
 
-// 创建基础消息标签
+            // 创建基础消息标签
             Label messageLabel = new Label(baseMessage);
             messageLabel.getStyleClass().add("label1");
             messageLabel.setWrapText(true); // 允许换行
             messageLabel.setMaxWidth(300); // 设置最大宽度
+            messageLabel.setStyle("-fx-font-size: 30px; -fx-text-alignment: center;"); // 调整字体大小并居中
 
-// 创建分数标签并设置颜色为红色
+            // 创建分数标签并设置颜色为红色
             Label scoreLabel = new Label(scorePart);
-            scoreLabel.setTextFill(Color.RED); // 设置文本颜色为红色
+            scoreLabel.setTextFill(Color.ORANGERED);
             scoreLabel.getStyleClass().add("label2");
-            scoreLabel.setWrapText(true); // 允许换行
+            scoreLabel.setWrapText(false); // 允许换行
             scoreLabel.setMaxWidth(300); // 设置最大宽度
+            scoreLabel.setStyle("-fx-font-size: 40px; -fx-font-weight: bold;"); // 调整字体大小并加粗
 
             String additionalMessage = "";
             if (state == 3) {
@@ -314,22 +313,27 @@ public class App extends Application {
                 additionalMessage = "\nCONGRATULATIONS! YOUR PERSONAL BEST BIRTH!";
             }
 
-// 创建附加消息标签
+            // 创建附加消息标签
             Label additionalLabel = new Label(additionalMessage);
             additionalLabel.getStyleClass().add("label1");
             additionalLabel.setWrapText(true); // 允许换行
             additionalLabel.setMaxWidth(300); // 设置最大宽度
+            additionalLabel.setStyle("-fx-font-size: 20px; -fx-text-alignment: center;");
 
-// 创建确认按钮
+            // 创建确认按钮
             Button confirmButton = new Button("CONFIRM");
+            confirmButton.setPrefSize(100, 100.0*98/231); // 设置宽高
+            addHoverAnimation(confirmButton);
             confirmButton.setOnAction(e -> {
                 // 确认按钮点击事件处理逻辑
                 gameEndStage.close(); // 关闭游戏结束窗口
                 System.exit(0);
             });
 
-// 使用 VBox 垂直排列 label 和 button
-            VBox vbox = new VBox(10, messageLabel, scoreLabel, additionalLabel, confirmButton);
+            // 使用 VBox 垂直排列 label 和 button
+            HBox hbox = new HBox(10, messageLabel, scoreLabel);
+            hbox.setAlignment(Pos.CENTER);
+            VBox vbox = new VBox(10,  hbox,additionalLabel, confirmButton);
             vbox.setPrefSize(100, 200);
             VBox.setMargin(messageLabel, new Insets(50, 0, 0, 0)); // 上边距为 50，左右下边距为 0
             vbox.setAlignment(Pos.CENTER); // 设置对齐方式为居中
@@ -338,7 +342,6 @@ public class App extends Application {
             scene.getStylesheets().add(App.class.getResource("/style/style.css").toExternalForm()); // 加载 CSS 文件
             gameEndStage.setScene(scene);
             gameEndStage.show();
-
         });
     }
 
