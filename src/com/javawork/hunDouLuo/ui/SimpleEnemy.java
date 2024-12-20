@@ -158,6 +158,7 @@
        g.drawImage(Imgs.ENEMYBOMBING, (int)(this.position.x - mapPosition) * 3 - 45, (int)(this.position.y * 3.0F) - 90, (int)(this.position.x - mapPosition) * 3 + 45, (int)(this.position.y * 3.0F), 180, 0, 270, 90, null);
      }
      else
+       //死的动画过去了,死过了
        this.state = 5;
    }
  

@@ -493,6 +493,7 @@ import java.util.Random;
    private void playPreBossBattleAnimation(Graphics2D g)
    {
      this.sceneWidth = 3628;
+     //这个时候变3628,3628-3328=300最后领域
      if (this.mapPosition < 3328.0F)
      {
        FloatPoint tmp22_19 = this.scenePosition; tmp22_19.y = (float)(tmp22_19.y + 6.0D * Math.sin(this.delta++));
@@ -526,6 +527,7 @@ import java.util.Random;
        if ((e.position.x > this.mapPosition) && (e.position.x < this.mapPosition + this.backgroundSizeOfWidth / 3) && 
          (!e.visible)) {
          e.visible = true;
+         //不是射击怪
          if (e.type != 4) {
            e.state = 1;
            e.towardsLeft = true;
@@ -561,6 +563,7 @@ import java.util.Random;
              this.hero.deathEventType = 2;
              SoundUtils.playSound("audios/death.wav");
            }
+           //怪死
            else {
              e.state = 4;
            }
@@ -587,6 +590,7 @@ import java.util.Random;
        GrassLand movingGrassLand = new GrassLand(new FloatPoint(24.0F, 110.0F), 1);
        movingGrassLand.movingDirection = 3;
        this.grassLands[(this.grassLands.length - 2)] = movingGrassLand;
+       //没跳过去,map回过来
        this.mapPosition = 680.0F;
        this.hero = new Hero(new FloatPoint(700.0F, 0.0F), 2);
      }
@@ -630,6 +634,7 @@ import java.util.Random;
  
    private FloatPoint findBirthPlace()
    {
+     //防止重生到河里
      if ((this.passedFirstMovingGrassLand) && (this.grassLands[(this.grassLands.length - 2)].position.x * 32.0F + 32.0F > this.mapPosition)) {
        for (int j = (int)(this.grassLands[(this.grassLands.length - 2)].position.x * 32.0F + 50.0F); j < this.backgroundSizeOfWidth / 3 + this.mapPosition; j += 32) {
          for (int i = 0; i < this.backgroundSizeOfHeight / 3; i += 3) {
@@ -703,6 +708,7 @@ import java.util.Random;
    {
      for (int i = 0; i < this.enemys.size(); i++) {
        SimpleEnemy enemy = (SimpleEnemy)this.enemys.get(i);
+       //掉落
        if ((!isGrassLand(enemy.position.x, enemy.position.y + 2.0F)) && (!enemy.jumping)) {
          enemy.position.y += 2.0F;
        }
@@ -807,6 +813,7 @@ import java.util.Random;
                  enemy.position.x += this.walkSpeed;
                }
                else if ((isGrassLand(enemy.position.x, enemy.position.y + 2.0F)) && (!isGrassLand(enemy.position.x - 3.0F, enemy.position.y + 2.0F))) {
+                 //会判断跳跃的智能怪
                  if (isASafetyJump(new FloatPoint(enemy.position.x, enemy.position.y), enemy.direction)) {
                    enemy.state = 2;
                    enemy.jumping = true;
@@ -857,7 +864,7 @@ import java.util.Random;
          enemy.state = 4;
      }
    }
- 
+ //针对会移动的草
    private boolean isASafetyJump(FloatPoint position, int direction)
    {
      if (direction == 2) {
@@ -1038,18 +1045,19 @@ import java.util.Random;
          this.enemys.remove(i);
        }
      }
+     //两层循环，一个循环是heroBullets，一个循环是enemys,判断血量
      for (int i = 0; i < this.enemys.size(); i++) {
        SimpleEnemy e = (SimpleEnemy)this.enemys.get(i);
        for (int j = 0; j < this.heroBullets.size(); j++) {
          Bullet b = (Bullet)this.heroBullets.get(j);
          if (e.touchHeroBulletCheck(b)) {
            if ((e.state == 4) || (e.state == 5)) break;
+           //伤害根据子弹的energy决定
            e.beShotted(b.energy);
            if(e.isShottedByHero){
              score++;
            }
            this.heroBullets.remove(j);
- 
            break;
          }
        }
@@ -1058,6 +1066,7 @@ import java.util.Random;
        for (int i = 0; i < this.heroBullets.size(); i++) {
          Bullet b = (Bullet)this.heroBullets.get(i);
          if (this.boss.touchHeroBulletCheck(b)) {
+           //伤害根据子弹的energy决定
            this.boss.beShotted(b.energy);
            this.heroBullets.remove(i);
          }

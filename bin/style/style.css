@@ -15,7 +15,7 @@
     -fx-padding: 0;
     -fx-font-family: 'Championship';
     -fx-font-size: 20px;
-    -fx-text-fill: rgb(74, 49, 0);
+    -fx-text-fill: rgb(110, 60, 0);
 
 }
 
@@ -24,9 +24,9 @@
     -fx-opacity: 0.89;
     -fx-alignment: center;
     -fx-font-family: "Championship";
-    -fx-font-size: 15px;
+    -fx-font-size: 25px;
     -fx-font-weight: bold;
-    -fx-text-fill: rgb(74, 49, 0);
+    -fx-text-fill: rgb(120, 60, 0);
 
 
 }
