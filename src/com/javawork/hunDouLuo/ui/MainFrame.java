@@ -7,10 +7,7 @@ import sshWeb.SSHService;
 import timer.GameTimer;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +99,16 @@ import static com.javawork.hunDouLuo.ui.App.gameEnd;
      setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
      setLocation((this.screenSize.width - getWidth()) / 2, 20);
      setVisible(false);
-
+     this.addComponentListener(new ComponentAdapter() {
+       @Override
+       public void componentMoved(ComponentEvent e) {
+         // 更新 victoryframe 的位置
+         Point mainFrameLocation = getLocationOnScreen();
+         int vx = mainFrameLocation.x + 320;
+         int vy = mainFrameLocation.y + 350;
+         victoryFrame.setLocation(vx, vy);
+       }
+     });
      this.addWindowListener(new WindowAdapter() {
        @Override
        public void windowClosing(WindowEvent e) {
