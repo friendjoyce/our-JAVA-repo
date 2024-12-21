@@ -1,5 +1,5 @@
- package com.javawork.hunDouLuo.ui;
- 
+package com.javawork.hunDouLuo.ui;
+
 // import sun.audio.AudioPlayer;
 
 import javafx.application.Platform;
@@ -18,213 +18,232 @@ import java.util.Random;
 
 import static com.javawork.hunDouLuo.ui.App.gameEnd;
 
- public class MainFrame extends Frame
-   implements Runnable
- {
-   static GameTimer timer = new GameTimer();
-   private boolean firstTime = true;
-   private BufferedImage bi;
-   private Graphics2D big;
-   AlphaComposite alphaComposite = AlphaComposite.getInstance(3, 0.5F);
-   AlphaComposite alphaComposite2 = AlphaComposite.getInstance(3, 1.0F);
-   //mapPosition 指定了背景或地图的横向偏移值（X 方向）在整个场景中，坐标原点通常位于左上角（0, 0），但 mapPosition 的引入使得绘制内容会根据当前视角动态调整。
-   //position 和 mapposition 之差表示角色相对于视野窗口的偏移，然后乘以每个格子的像素大小，得出角色绘制的 x 坐标。
-   //坐标轴方向：X 轴：从左向右为正方向。Y 轴：从上向下为正方向。
-   public float mapPosition = 0.0F;
-   private FloatPoint bgPosition = new FloatPoint(20.0F, 90.0F);
-   private FloatPoint scenePosition = new FloatPoint(0.0F, 0.0F);
-   private int sceneWidth = 3328;
-   private int backgroundSizeOfWidth = 900;
-   private int backgroundSizeOfHeight = 672;
-   private Hero hero;
-   private static int FPS = 60;
-   private int walkSpeed = 10;
-   private GrassLand[] grassLands = new GrassLand[41];
-   private Random random = new Random();
-   Toolkit toolkit = Toolkit.getDefaultToolkit();
-   Dimension screenSize = this.toolkit.getScreenSize();
-   List<Bullet> heroBullets;
-   List<Bullet> enemyBullets;
-   private boolean leftDown = false;
-   private boolean rightDown = false;
-   private boolean upDown = false;
-   private boolean downDown = false;
-   private boolean jumpDown = false;
-   private int heroNum = 1;
-   private List<SimpleEnemy> enemys = new ArrayList();
-   private boolean showBossScene = false;
-   private Boss boss;
-   private List<BossChild> bossChildren = new ArrayList();
-   GameStartBackgroundSoundThread gameStartBgSoundThread;
-   PreBossBackgroundSoundThread preBossBgSoundThread;
-   BossBackgroundSoundThread bossBgSound;
-   boolean addEnemy1 = true;
-   boolean addEnemy2 = true;
- 
-   int simpleEnemyNum = 0;
-   boolean bossBattle = false;
-   int timeCont = 0;
- 
-   boolean playPreBossStoneSound = true;
-   boolean playGameOverSound = false;
- 
-   int delta = 0;
-   boolean preBossBattle = false;
- 
-   private boolean passedFirstMovingGrassLand = false;
-   private boolean passedSecondMovingGrassLand = false;
- 
-   boolean stopBossBgSound = true;
+public class MainFrame extends Frame
+        implements Runnable
+{
+  static GameTimer timer = new GameTimer();
+  private boolean firstTime = true;
+  private BufferedImage bi;
+  private Graphics2D big;
+  AlphaComposite alphaComposite = AlphaComposite.getInstance(3, 0.5F);
+  AlphaComposite alphaComposite2 = AlphaComposite.getInstance(3, 1.0F);
+  //mapPosition 指定了背景或地图的横向偏移值（X 方向）在整个场景中，坐标原点通常位于左上角（0, 0），但 mapPosition 的引入使得绘制内容会根据当前视角动态调整。
+  //position 和 mapposition 之差表示角色相对于视野窗口的偏移，然后乘以每个格子的像素大小，得出角色绘制的 x 坐标。
+  //坐标轴方向：X 轴：从左向右为正方向。Y 轴：从上向下为正方向。
+  public float mapPosition = 0.0F;
+  private FloatPoint bgPosition = new FloatPoint(20.0F, 90.0F);
+  private FloatPoint scenePosition = new FloatPoint(0.0F, 0.0F);
+  private int sceneWidth = 3328;
+  private int backgroundSizeOfWidth = 900;
+  private int backgroundSizeOfHeight = 672;
+  private Hero hero;
+  private static int FPS = 60;
+  private int walkSpeed = 10;
+  private GrassLand[] grassLands = new GrassLand[41];
+  private Random random = new Random();
+  Toolkit toolkit = Toolkit.getDefaultToolkit();
+  Dimension screenSize = this.toolkit.getScreenSize();
+  List<Bullet> heroBullets;
+  List<Bullet> enemyBullets;
+  private boolean leftDown = false;
+  private boolean rightDown = false;
+  private boolean upDown = false;
+  private boolean downDown = false;
+  private boolean jumpDown = false;
+  private int heroNum = 1;
+  private List<SimpleEnemy> enemys = new ArrayList();
+  private boolean showBossScene = false;
+  private Boss boss;
+  private List<BossChild> bossChildren = new ArrayList();
+  GameStartBackgroundSoundThread gameStartBgSoundThread;
+  PreBossBackgroundSoundThread preBossBgSoundThread;
+  BossBackgroundSoundThread bossBgSound;
+  boolean addEnemy1 = true;
+  boolean addEnemy2 = true;
 
-   static int score = 0;
-   public volatile boolean running = true; // 标志位
-   public static String username;
-   victoryframe victoryFrame;
-   Victorysoundthread  victorySoundThread;
-   boolean playvictorySound=false;
-   private boolean paused = false;
+  int simpleEnemyNum = 0;
+  boolean bossBattle = false;
+  int timeCont = 0;
 
-   public MainFrame()
-   {
-     this.setVisible(true);
-     this.victorySoundThread=new Victorysoundthread ();
-     this.victoryFrame=new victoryframe(this.getLocationOnScreen().x,this.getLocationOnScreen().y,this);
-     this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
-     new Thread(this.gameStartBgSoundThread).start();
-     this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
-     this.heroBullets = new ArrayList();
-     this.enemyBullets = new ArrayList();
-     initGrassLands();
-     initEnemys();
-     setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
-     setLocation((this.screenSize.width - getWidth()) / 2, 20);
-     setVisible(false);
-     this.addComponentListener(new ComponentAdapter() {
-       @Override
-       public void componentMoved(ComponentEvent e) {
-         // 更新 victoryframe 的位置
-         Point mainFrameLocation = getLocationOnScreen();
-         int vx = mainFrameLocation.x + 320;
-         int vy = mainFrameLocation.y + 350;
-         victoryFrame.setLocation(vx, vy);
-       }
-     });
-     this.addWindowListener(new WindowAdapter() {
-       @Override
-       public void windowClosing(WindowEvent e) {
-         // 在窗口关闭时退出程序
-         System.exit(0);
-       }
-     });
- 
-     addKeyListener(new KeyListener()
-     {
-       public void keyTyped(KeyEvent e)
-       {
-         if (KeyEvent.getKeyText(e.getKeyChar()).equals("Esc"))
-           paused = !paused;
-       }
- 
-       public void keyReleased(KeyEvent e)
-       {
-         MainFrame.this.setKeyStateWhenKeyReleased(e);
-         if ((MainFrame.this.hero.state != 4) && (MainFrame.this.hero.state != 5)) {
-           if (KeyEvent.getKeyText(e.getKeyCode()).equals("J")) {
-             MainFrame.this.hero.canShot = true;
-           }
-           if (KeyEvent.getKeyText(e.getKeyCode()).equals("K"))
-             MainFrame.this.hero.canDrop = true;
-         }
-       }
- 
-       public void keyPressed(KeyEvent e)
-       {
-         int type = e.getKeyCode() - 48;
-         if ((type > 0) && (type < 5)) {
-           MainFrame.this.hero.weapon = WeaponFactory.getWeapon(type);
-         }
- 
-         MainFrame.this.setKeyStateWhenKeyPressed(e);
-         if ((MainFrame.this.hero.state != 4) && (MainFrame.this.hero.state != 5)) {
-           if (KeyEvent.getKeyText(e.getKeyCode()).equals("J")) {
-             if (MainFrame.this.hero.canShot) {
-               if (((MainFrame.this.hero.weapon instanceof NunLinerWeapon)) && (MainFrame.this.heroBullets.size() < 4)) {
-                 MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(1));
-               }
-               else if (((MainFrame.this.hero.weapon instanceof SimpleWeapon)) && (MainFrame.this.heroBullets.size() < 6)) {
-                 MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(1));
-               }
-               else if (((MainFrame.this.hero.weapon instanceof StrongWeapon)) && (MainFrame.this.heroBullets.size() < 6)) {
-                 MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(1));
-               }
-               else if (((MainFrame.this.hero.weapon instanceof ShotWeapon)) && (MainFrame.this.heroBullets.size() < 10)) {
-                 MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(10 - MainFrame.this.heroBullets.size()));
-               }
-             }
- 
-             MainFrame.this.hero.canShot = false;
-           }
-           if ((KeyEvent.getKeyText(e.getKeyCode()).equals("K")||KeyEvent.getKeyText(e.getKeyCode()).equals(" ")) &&
-             (MainFrame.this.hero.canDrop) && (MainFrame.this.hero.state == 3) && (MainFrame.this.hero.position.y < MainFrame.this.backgroundSizeOfHeight - 60)) {
-             if (MainFrame.this.hero.position.y < 206.0F)
-               MainFrame.this.hero.position.y += 6.0F;
-             MainFrame.this.hero.canDrop = false;
-           }
-         }
-       }
-     });
+  boolean playPreBossStoneSound = true;
+  boolean playGameOverSound = false;
+
+  int delta = 0;
+  boolean preBossBattle = false;
+
+  private boolean passedFirstMovingGrassLand = false;
+  private boolean passedSecondMovingGrassLand = false;
+
+  boolean stopBossBgSound = true;
+
+  static int score = 0;
+  public volatile boolean running = true; // 标志位
+  public static String username;
+  victoryframe victoryFrame;
+  Victorysoundthread  victorySoundThread;
+  boolean playvictorySound=false;
+  private boolean paused = false;
+  private Boolean showControls = false;
+
+  public MainFrame()
+  {
+    this.setVisible(true);
+    this.victorySoundThread=new Victorysoundthread ();
+    this.victoryFrame=new victoryframe(this.getLocationOnScreen().x,this.getLocationOnScreen().y,this);
+    this.gameStartBgSoundThread = new GameStartBackgroundSoundThread();
+    new Thread(this.gameStartBgSoundThread).start();
+    this.hero = new Hero(new FloatPoint(50.0F, 30.0F), 2);
+    this.heroBullets = new ArrayList();
+    this.enemyBullets = new ArrayList();
+    initGrassLands();
+    initEnemys();
+    setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
+    setLocation((this.screenSize.width - getWidth()) / 2, 20);
+    setVisible(false);
+    this.addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentMoved(ComponentEvent e) {
+        // 更新 victoryframe 的位置
+        Point mainFrameLocation = getLocationOnScreen();
+        int vx = mainFrameLocation.x + 320;
+        int vy = mainFrameLocation.y + 350;
+        victoryFrame.setLocation(vx, vy);
+      }
+    });
+    this.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        // 在窗口关闭时退出程序
+        System.exit(0);
+      }
+    });
+
+    addKeyListener(new KeyListener()
+    {
+      public void keyTyped(KeyEvent e)
+      {
+
+      }
+
+      public void keyReleased(KeyEvent e)
+      {
+        if (KeyEvent.getKeyText(e.getKeyCode()).equals("Esc")) {
+          paused = !paused;  // 切换暂停状态
+          showControls = false;
+          System.out.println("Paused: " + paused);
+          repaint();  // 刷新界面，确保暂停菜单显示
+        }
+        MainFrame.this.setKeyStateWhenKeyReleased(e);
+        if ((MainFrame.this.hero.state != 4) && (MainFrame.this.hero.state != 5)) {
+          if (KeyEvent.getKeyText(e.getKeyCode()).equals("J")) {
+            MainFrame.this.hero.canShot = true;
+          }
+          if (KeyEvent.getKeyText(e.getKeyCode()).equals("K"))
+            MainFrame.this.hero.canDrop = true;
+        }
+      }
+
+      public void keyPressed(KeyEvent e)
+      {
+        if (KeyEvent.getKeyText(e.getKeyCode()).equals("Enter")) {
+          if (paused) { // 在暂停状态下才处理
+            showControls = !showControls; // 切换操作说明显示状态
+            repaint(); // 刷新界面
+          }
+        }
+
+        if (KeyEvent.getKeyText(e.getKeyCode()).equals("P")) {
+          if (paused) { // 在暂停状态下才处理
+            System.exit(0); // 直接退出程序
+          }
+        }
+
+        int type = e.getKeyCode() - 48;
+        if ((type > 0) && (type < 5)) {
+          MainFrame.this.hero.weapon = WeaponFactory.getWeapon(type);
+        }
+
+        MainFrame.this.setKeyStateWhenKeyPressed(e);
+        if ((MainFrame.this.hero.state != 4) && (MainFrame.this.hero.state != 5)) {
+          if (KeyEvent.getKeyText(e.getKeyCode()).equals("J")) {
+            if (MainFrame.this.hero.canShot) {
+              if (((MainFrame.this.hero.weapon instanceof NunLinerWeapon)) && (MainFrame.this.heroBullets.size() < 4)) {
+                MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(1));
+              }
+              else if (((MainFrame.this.hero.weapon instanceof SimpleWeapon)) && (MainFrame.this.heroBullets.size() < 6)) {
+                MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(1));
+              }
+              else if (((MainFrame.this.hero.weapon instanceof StrongWeapon)) && (MainFrame.this.heroBullets.size() < 6)) {
+                MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(1));
+              }
+              else if (((MainFrame.this.hero.weapon instanceof ShotWeapon)) && (MainFrame.this.heroBullets.size() < 10)) {
+                MainFrame.this.heroBullets.addAll(MainFrame.this.hero.shot(10 - MainFrame.this.heroBullets.size()));
+              }
+            }
+
+            MainFrame.this.hero.canShot = false;
+          }
+          if ((KeyEvent.getKeyText(e.getKeyCode()).equals("K")||KeyEvent.getKeyText(e.getKeyCode()).equals(" ")) &&
+                  (MainFrame.this.hero.canDrop) && (MainFrame.this.hero.state == 3) && (MainFrame.this.hero.position.y < MainFrame.this.backgroundSizeOfHeight - 60)) {
+            if (MainFrame.this.hero.position.y < 206.0F)
+              MainFrame.this.hero.position.y += 6.0F;
+            MainFrame.this.hero.canDrop = false;
+          }
+        }
+      }
+    });
    }
 
    private void initEnemys()
    {
      //0-3都是那个只会跑的,不过有的会跳,有的会之间冲过来,4是只站立的射击怪
-     SimpleEnemy[] enemy0 = { new SimpleEnemy(new FloatPoint(300.0F, 100.0F), 6, 0), 
-       new SimpleEnemy(new FloatPoint(332.0F, 100.0F), 6, 0), 
-       new SimpleEnemy(new FloatPoint(390.0F, 100.0F), 6, 0), 
-       new SimpleEnemy(new FloatPoint(450.0F, 100.0F), 6, 0), 
+     SimpleEnemy[] enemy0 = { new SimpleEnemy(new FloatPoint(300.0F, 100.0F), 6, 0),
+       new SimpleEnemy(new FloatPoint(332.0F, 100.0F), 6, 0),
+       new SimpleEnemy(new FloatPoint(390.0F, 100.0F), 6, 0),
+       new SimpleEnemy(new FloatPoint(450.0F, 100.0F), 6, 0),
        new SimpleEnemy(new FloatPoint(550.0F, 100.0F), 6, 0) };
-     SimpleEnemy[] enemy1 = { new SimpleEnemy(new FloatPoint(600.0F, 100.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(600.0F, 100.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(620.0F, 100.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(1320.0F, 100.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(1380.0F, 100.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(1650.0F, 130.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(1750.0F, 130.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(3070.0F, 190.0F), 6, 1), 
-       new SimpleEnemy(new FloatPoint(3140.0F, 190.0F), 6, 1), 
+     SimpleEnemy[] enemy1 = { new SimpleEnemy(new FloatPoint(600.0F, 100.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(600.0F, 100.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(620.0F, 100.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(1320.0F, 100.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(1380.0F, 100.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(1650.0F, 130.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(1750.0F, 130.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(3070.0F, 190.0F), 6, 1),
+       new SimpleEnemy(new FloatPoint(3140.0F, 190.0F), 6, 1),
        new SimpleEnemy(new FloatPoint(3200.0F, 190.0F), 6, 1) };
-     SimpleEnemy[] enemy2 = { new SimpleEnemy(new FloatPoint(1400.0F, 70.0F), 6, 2), 
-       new SimpleEnemy(new FloatPoint(1430.0F, 70.0F), 6, 2), 
-       new SimpleEnemy(new FloatPoint(2240.0F, 100.0F), 6, 2), 
-       new SimpleEnemy(new FloatPoint(2460.0F, 100.0F), 6, 2), 
-       new SimpleEnemy(new FloatPoint(2600.0F, 100.0F), 6, 2), 
-       new SimpleEnemy(new FloatPoint(2860.0F, 165.0F), 6, 2), 
+     SimpleEnemy[] enemy2 = { new SimpleEnemy(new FloatPoint(1400.0F, 70.0F), 6, 2),
+       new SimpleEnemy(new FloatPoint(1430.0F, 70.0F), 6, 2),
+       new SimpleEnemy(new FloatPoint(2240.0F, 100.0F), 6, 2),
+       new SimpleEnemy(new FloatPoint(2460.0F, 100.0F), 6, 2),
+       new SimpleEnemy(new FloatPoint(2600.0F, 100.0F), 6, 2),
+       new SimpleEnemy(new FloatPoint(2860.0F, 165.0F), 6, 2),
        new SimpleEnemy(new FloatPoint(2960.0F, 130.0F), 6, 2) };
-     SimpleEnemy[] enemy3 = { new SimpleEnemy(new FloatPoint(465.0F, 138.0F), 6, 3), 
-       new SimpleEnemy(new FloatPoint(662.0F, 148.0F), 6, 3), 
-       new SimpleEnemy(new FloatPoint(900.0F, 100.0F), 6, 3), 
-       new SimpleEnemy(new FloatPoint(1000.0F, 100.0F), 6, 3), 
-       new SimpleEnemy(new FloatPoint(1650.0F, 70.0F), 6, 3), 
-       new SimpleEnemy(new FloatPoint(2220.0F, 130.0F), 6, 3), 
-       new SimpleEnemy(new FloatPoint(2490.0F, 70.0F), 6, 3), 
+     SimpleEnemy[] enemy3 = { new SimpleEnemy(new FloatPoint(465.0F, 138.0F), 6, 3),
+       new SimpleEnemy(new FloatPoint(662.0F, 148.0F), 6, 3),
+       new SimpleEnemy(new FloatPoint(900.0F, 100.0F), 6, 3),
+       new SimpleEnemy(new FloatPoint(1000.0F, 100.0F), 6, 3),
+       new SimpleEnemy(new FloatPoint(1650.0F, 70.0F), 6, 3),
+       new SimpleEnemy(new FloatPoint(2220.0F, 130.0F), 6, 3),
+       new SimpleEnemy(new FloatPoint(2490.0F, 70.0F), 6, 3),
        new SimpleEnemy(new FloatPoint(2990.0F, 100.0F), 6, 3) };
-     SimpleEnemy[] enemy4 = { new SimpleEnemy(new FloatPoint(306.0F, 200.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(440.0F, 100.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(600.0F, 195.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(950.0F, 100.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(1250.0F, 100.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(1550.0F, 70.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(1500.0F, 140.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(1750.0F, 70.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(1850.0F, 200.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(2090.0F, 70.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(2320.0F, 200.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(2470.0F, 200.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(3050.0F, 100.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(3050.0F, 150.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(3050.0F, 190.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(3110.0F, 100.0F), 6, 4), 
-       new SimpleEnemy(new FloatPoint(3140.0F, 130.0F), 6, 4), 
+     SimpleEnemy[] enemy4 = { new SimpleEnemy(new FloatPoint(306.0F, 200.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(440.0F, 100.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(600.0F, 195.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(950.0F, 100.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(1250.0F, 100.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(1550.0F, 70.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(1500.0F, 140.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(1750.0F, 70.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(1850.0F, 200.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(2090.0F, 70.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(2320.0F, 200.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(2470.0F, 200.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(3050.0F, 100.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(3050.0F, 150.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(3050.0F, 190.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(3110.0F, 100.0F), 6, 4),
+       new SimpleEnemy(new FloatPoint(3140.0F, 130.0F), 6, 4),
        new SimpleEnemy(new FloatPoint(3180.0F, 160.0F), 6, 4) };
      for (int i = 0; i < enemy0.length; i++) {
        enemy0[i].state = 0;
@@ -253,7 +272,7 @@ import static com.javawork.hunDouLuo.ui.App.gameEnd;
    {
      //调用父类的paint函数,清除画布内容
      super.paint(g);
-     g.setColor(Color.GRAY);
+     g.setColor(Color.black);
      g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
      g.setColor(Color.BLACK);
      g.setFont(new Font(null, 1, 30));
@@ -271,70 +290,140 @@ import static com.javawork.hunDouLuo.ui.App.gameEnd;
 //     g.drawString("JAVA大作业DEMO", 780, 560);
    }
    //update适合动态的场景使用
-   public void update(Graphics g)
-   {
-     //将 Graphics 对象转换为 Graphics2D，以便使用更多绘图功能。
-     Graphics2D g2 = (Graphics2D)g;
-     //如果是第一次调用，初始化画布资源：
-     if (this.firstTime) {
-       Dimension dim = getSize();
-       int w = dim.width;
-       int h = dim.height;
-       new Rectangle(dim);
-       //双缓冲的“双”：前缓冲：显示在屏幕上的画面。后缓冲：内存中的画布，用于准备下一帧内容。
-       //所有绘图操作都在后缓冲中完成。
-       //绘制完成后，将后缓冲的内容一次性复制到前缓冲（屏幕）。
-       //避免了直接在屏幕上多次绘图带来的闪烁现象。
-       this.bi = ((BufferedImage)createImage(w, h));
-       //BufferedImage 是内存中的一块画布，用于存储最终的图像。
-       //它是绘图内容的容器。
-       this.big = this.bi.createGraphics();
-       //this.big：操作后缓冲的绘图工具，是从 this.bi.createGraphics() 得到的 Graphics2D 对象。
-       //它负责在后缓冲（this.bi）上绘制所有内容。
-       this.firstTime = false;
-       this.big.setStroke(new BasicStroke(1.0F));
-     }
-     //绘制背景图（Imgs.BACKGROUND01），动态调整背景位置和显示的大小。
-     //目标区域的左上角 (dx1, dy1)决定图像绘制在屏幕的起始位置。目标区域的右下角 (dx2, dy2)。决定图像在屏幕上的宽度和高度。后面四个是源图像的左上和右下,672其实是带着一点放大的背景,原图片也就224
-     //这个时候this.big还没绘制完成
-     //绘制顺序严格按照代码书写的顺序：
-     //背景 → NPC → 主角 → 子弹等。
-     //后绘制的内容会覆盖先绘制的内容。
-     this.big.drawImage(Imgs.BACKGROUND01, (int)this.scenePosition.x, (int)this.scenePosition.y, this.backgroundSizeOfWidth, (int)this.scenePosition.y + 672, (int)this.mapPosition, 0, (int)this.mapPosition + this.backgroundSizeOfWidth / 3, 224, null);
-     drawNPC(this.big);
-     if (this.showBossScene) {
-       playPreBossBattleAnimation(this.big);
-     }
-     if (this.bossBattle) {
-       playBossBattleAnimation(this.big);
-     }
-     for (int i = 0; i < this.enemys.size(); i++) {
-       ((SimpleEnemy)this.enemys.get(i)).drawPlayer(this.big, this.mapPosition);
-     }
-     if (this.bossChildren.size() > 0) {
-       playBossChildrenAnimation(this.big);
+   public void update(Graphics g) {
+     // 如果游戏暂停
+     Graphics2D g2 = (Graphics2D) g;
+
+     // 游戏暂停时绘制黑色半透明背景
+     if (paused) {
+       // 绘制游戏当前画面
+       drawGameContent(g2);
+
+       // 设置透明度
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f)); // 半透明黑色背景
+       g2.setColor(Color.BLACK);
+       g2.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
+
+       // 恢复透明度设置
+       g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+
+       // 判断显示内容：操作说明或暂停菜单
+       if (showControls) {
+         drawControls(g2); // 显示操作说明
+       } else {
+         drawPauseMenu(g2); // 显示暂停菜单
+       }
+
+       return; // 返回，防止继续绘制其他内容
      }
 
-     if (!this.hero.visible) {
-       //设置是否可见(可被攻击)
-       this.big.setComposite(this.alphaComposite);
-     }
-     //draw 参数一直是 this.big,this.big 是从 BufferedImage 创建的 Graphics2D 对象,避免直接在屏幕上绘制，减少屏幕闪烁。
-     //所有绘制操作先在内存画布中完成，最后统一渲染到屏幕。通过 BufferedImage，可以保存整个画面状态，方便后续操作（如缩放、重绘等）
-     this.hero.drawPlayer(this.big, this.mapPosition);
-     this.big.setComposite(this.alphaComposite2);
-     drawHeroBullets(this.big);
-     drawEnemyBullets(this.big);
-     this.big.setColor(Color.WHITE);
-     this.big.setFont(new Font(null, 1, 28));
-     g2.setColor(Color.GRAY);
-     g2.fillRect(0, 0, getWidth(), getHeight());
-     //this.big 是 Graphics2D，用于操作后缓冲。
-     //g2 是 Graphics2D，用于操作屏幕画布。
-     g2.drawImage(this.bi, (int)this.bgPosition.x, (int)this.bgPosition.y, (int)(this.backgroundSizeOfWidth / 1.3D), (int)(this.backgroundSizeOfHeight / 1.3D), this);
+     // 如果游戏没有暂停，正常绘制游戏内容
+     drawGameContent(g2);
    }
 
-   private void playBossChildrenAnimation(Graphics2D big2)
+  // 绘制暂停菜单
+  private void drawPauseMenu(Graphics g) {
+    g.setColor(Color.WHITE);
+    g.setFont(new Font("楷体", Font.BOLD, 40));
+    g.drawString("游戏已暂停", this.backgroundSizeOfWidth / 2 - 100, this.backgroundSizeOfHeight / 2 - 50);
+
+    g.setFont(new Font("楷体", Font.PLAIN, 30));
+    g.drawString("按 'Esc' 继续游戏", this.backgroundSizeOfWidth / 2 - 120, this.backgroundSizeOfHeight / 2 + 10);
+    g.drawString("按 'Enter' 操作说明", this.backgroundSizeOfWidth / 2 - 120, this.backgroundSizeOfHeight / 2 + 50);
+    g.drawString("按 'P' 退出游戏", this.backgroundSizeOfWidth / 2 - 120, this.backgroundSizeOfHeight / 2 + 90);
+  }
+
+  // 绘制操作说明
+  private void drawControls(Graphics g) {
+    // 背景已是黑色，不需要再绘制
+
+    g.setColor(Color.WHITE);
+    g.setFont(new Font("楷体", Font.PLAIN, 30));
+
+    // 操作说明内容
+    String[] controlsText = {
+            "操作说明：",
+            "W 上, S 下",
+            "A 左, D 右",
+            "J 开枪",
+            "K 跳跃",
+            "1、2、3、4 切换武器",
+            "Esc 返回暂停菜单",
+            "P 退出游戏"
+    };
+
+    // 计算垂直居中位置
+    int lineHeight = 40; // 每行文字的高度
+    int startY = (this.backgroundSizeOfHeight - lineHeight * controlsText.length) / 2;
+
+    // 绘制每行文字
+    for (int i = 0; i < controlsText.length; i++) {
+      g.drawString(controlsText[i], this.backgroundSizeOfWidth / 2 - 120, startY + i * lineHeight);
+    }
+  }
+
+  // 绘制游戏内容
+  private void drawGameContent(Graphics g) {
+    Graphics2D g2 = (Graphics2D) g;
+
+    // 初始化画布资源
+    if (this.firstTime) {
+      Dimension dim = getSize();
+      int w = dim.width;
+      int h = dim.height;
+      new Rectangle(dim);
+      this.bi = ((BufferedImage) createImage(w, h));
+      this.big = this.bi.createGraphics();
+      this.firstTime = false;
+      this.big.setStroke(new BasicStroke(1.0F));
+    }
+
+    // 绘制背景
+    this.big.drawImage(Imgs.BACKGROUND01, (int) this.scenePosition.x, (int) this.scenePosition.y, this.backgroundSizeOfWidth, (int) this.scenePosition.y + 672, (int) this.mapPosition, 0, (int) this.mapPosition + this.backgroundSizeOfWidth / 3, 224, null);
+
+    // 绘制NPC
+    drawNPC(this.big);
+
+    // 绘制Boss场景
+    if (this.showBossScene) {
+      playPreBossBattleAnimation(this.big);
+    }
+    if (this.bossBattle) {
+      playBossBattleAnimation(this.big);
+    }
+
+    // 绘制敌人
+    for (int i = 0; i < this.enemys.size(); i++) {
+      ((SimpleEnemy) this.enemys.get(i)).drawPlayer(this.big, this.mapPosition);
+    }
+
+    // 绘制Boss子弹
+    if (this.bossChildren.size() > 0) {
+      playBossChildrenAnimation(this.big);
+    }
+
+    // 绘制主角
+    if (!this.hero.visible) {
+      this.big.setComposite(this.alphaComposite);
+    }
+    this.hero.drawPlayer(this.big, this.mapPosition);
+
+    // 恢复透明度
+    this.big.setComposite(this.alphaComposite2);
+
+    // 绘制子弹
+    drawHeroBullets(this.big);
+    drawEnemyBullets(this.big);
+
+    // 渲染到屏幕
+    g2.setColor(Color.black);
+    g2.fillRect(0, 0, getWidth(), getHeight());
+    g2.drawImage(this.bi, (int) this.bgPosition.x, (int) this.bgPosition.y, (int) (this.backgroundSizeOfWidth / 1.3D), (int) (this.backgroundSizeOfHeight / 1.3D), this);
+  }
+
+
+
+  private void playBossChildrenAnimation(Graphics2D big2)
    {
      for (int i = 0; i < this.bossChildren.size(); i++) {
        ((BossChild)this.bossChildren.get(i)).position.y += 0.1F;
