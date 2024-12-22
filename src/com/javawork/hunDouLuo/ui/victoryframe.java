@@ -13,7 +13,7 @@ public class victoryframe extends JFrame{
     private MainFrame mainFrame;
     public victoryframe(int x,int y,MainFrame frame) {
         setTitle("Custom Frame");
-        setSize(100, 150);
+        setSize(300, 150);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);        setLocationRelativeTo(null); // Center the frame
         setUndecorated(true); // Remove window decorations
         Point mainFrameLocation = new Point(x,y);
@@ -21,7 +21,7 @@ public class victoryframe extends JFrame{
         int vy = mainFrameLocation.y + 350;
         setLocation(vx, vy);
         // Create buttons
-        JButton button1 = createButton("Exit");
+        JButton button1 = createButton("Exit(click here)");
 //        JButton button2 = createButton("Back");
         try {
             // 构建字体文件路径：与src平级的font目录下

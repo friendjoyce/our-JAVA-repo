@@ -100,6 +100,7 @@ public class MainFrame extends Frame
     setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
     setLocation((this.screenSize.width - getWidth()) / 2, 20);
     setVisible(false);
+    setResizable(false);
     this.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentMoved(ComponentEvent e) {
@@ -274,14 +275,13 @@ public class MainFrame extends Frame
      super.paint(g);
      g.setColor(Color.black);
      g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
-     g.setColor(Color.BLACK);
+     g.setColor(Color.white);
      g.setFont(new Font(null, 1, 30));
-//     g.drawString("操作控制", 740, 100);
-//
-//     g.setFont(new Font(null, 1, 20));
-//     g.drawString("W 上, S 下", 740, 150);
-//     g.drawString("A 左, D 右", 745, 180);
-//     g.drawString("J 开枪", 745, 210);
+     g.drawString("温馨提示", 740, 100);
+     g.setFont(new Font(null, 1, 20));
+     g.drawString("按esc可以", 740, 150);
+     g.drawString("暂停并查看", 740, 180);
+     g.drawString("操作控制", 740, 210);
 //     g.drawString("K 跳跃", 745, 240);
 //     g.drawString("切枪:", 745, 270);
 //     g.drawString("1、2、3、4", 745, 300);
@@ -364,61 +364,70 @@ public class MainFrame extends Frame
 
   // 绘制游戏内容
   private void drawGameContent(Graphics g) {
-    Graphics2D g2 = (Graphics2D) g;
-
-    // 初始化画布资源
+    //将 Graphics 对象转换为 Graphics2D，以便使用更多绘图功能。
+    Graphics2D g2 = (Graphics2D)g;
+    //如果是第一次调用，初始化画布资源：
     if (this.firstTime) {
       Dimension dim = getSize();
       int w = dim.width;
       int h = dim.height;
       new Rectangle(dim);
-      this.bi = ((BufferedImage) createImage(w, h));
+      //双缓冲的“双”：前缓冲：显示在屏幕上的画面。后缓冲：内存中的画布，用于准备下一帧内容。
+      //所有绘图操作都在后缓冲中完成。
+      //绘制完成后，将后缓冲的内容一次性复制到前缓冲（屏幕）。
+      //避免了直接在屏幕上多次绘图带来的闪烁现象。
+      this.bi = ((BufferedImage)createImage(w, h));
+      //BufferedImage 是内存中的一块画布，用于存储最终的图像。
+      //它是绘图内容的容器。
       this.big = this.bi.createGraphics();
+      //this.big：操作后缓冲的绘图工具，是从 this.bi.createGraphics() 得到的 Graphics2D 对象。
+      //它负责在后缓冲（this.bi）上绘制所有内容。
       this.firstTime = false;
       this.big.setStroke(new BasicStroke(1.0F));
     }
-
-    // 绘制背景
-    this.big.drawImage(Imgs.BACKGROUND01, (int) this.scenePosition.x, (int) this.scenePosition.y, this.backgroundSizeOfWidth, (int) this.scenePosition.y + 672, (int) this.mapPosition, 0, (int) this.mapPosition + this.backgroundSizeOfWidth / 3, 224, null);
-
-    // 绘制NPC
+    //绘制背景图（Imgs.BACKGROUND01），动态调整背景位置和显示的大小。
+    //目标区域的左上角 (dx1, dy1)决定图像绘制在屏幕的起始位置。目标区域的右下角 (dx2, dy2)。决定图像在屏幕上的宽度和高度。后面四个是源图像的左上和右下,672其实是带着一点放大的背景,原图片也就224
+    //这个时候this.big还没绘制完成
+    //绘制顺序严格按照代码书写的顺序：
+    //背景 → NPC → 主角 → 子弹等。
+    //后绘制的内容会覆盖先绘制的内容。
+    this.big.drawImage(Imgs.BACKGROUND01, (int)this.scenePosition.x, (int)this.scenePosition.y, this.backgroundSizeOfWidth, (int)this.scenePosition.y + 672, (int)this.mapPosition, 0, (int)this.mapPosition + this.backgroundSizeOfWidth / 3, 224, null);
     drawNPC(this.big);
-
-    // 绘制Boss场景
     if (this.showBossScene) {
       playPreBossBattleAnimation(this.big);
     }
     if (this.bossBattle) {
       playBossBattleAnimation(this.big);
     }
-
-    // 绘制敌人
     for (int i = 0; i < this.enemys.size(); i++) {
-      ((SimpleEnemy) this.enemys.get(i)).drawPlayer(this.big, this.mapPosition);
+      ((SimpleEnemy)this.enemys.get(i)).drawPlayer(this.big, this.mapPosition);
     }
-
-    // 绘制Boss子弹
     if (this.bossChildren.size() > 0) {
       playBossChildrenAnimation(this.big);
     }
 
-    // 绘制主角
     if (!this.hero.visible) {
+      //设置是否可见(可被攻击)
       this.big.setComposite(this.alphaComposite);
     }
+    //draw 参数一直是 this.big,this.big 是从 BufferedImage 创建的 Graphics2D 对象,避免直接在屏幕上绘制，减少屏幕闪烁。
+    //所有绘制操作先在内存画布中完成，最后统一渲染到屏幕。通过 BufferedImage，可以保存整个画面状态，方便后续操作（如缩放、重绘等）
     this.hero.drawPlayer(this.big, this.mapPosition);
-
-    // 恢复透明度
     this.big.setComposite(this.alphaComposite2);
-
-    // 绘制子弹
     drawHeroBullets(this.big);
     drawEnemyBullets(this.big);
-
-    // 渲染到屏幕
     g2.setColor(Color.black);
     g2.fillRect(0, 0, getWidth(), getHeight());
-    g2.drawImage(this.bi, (int) this.bgPosition.x, (int) this.bgPosition.y, (int) (this.backgroundSizeOfWidth / 1.3D), (int) (this.backgroundSizeOfHeight / 1.3D), this);
+    g.setColor(Color.white);
+    g.setFont(new Font(null, 1, 30));
+    g.drawString("温馨提示", 740, 100);
+    g.setFont(new Font(null, 1, 20));
+    g.drawString("按esc可以", 740, 150);
+    g.drawString("暂停并查看", 740, 180);
+    g.drawString("操作控制", 740, 210);
+    //this.big 是 Graphics2D，用于操作后缓冲。
+    //g2 是 Graphics2D，用于操作屏幕画布。
+    g2.drawImage(this.bi, (int)this.bgPosition.x, (int)this.bgPosition.y, (int)(this.backgroundSizeOfWidth / 1.3D), (int)(this.backgroundSizeOfHeight / 1.3D), this);
   }
 
 
