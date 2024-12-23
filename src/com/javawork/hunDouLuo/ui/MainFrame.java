@@ -38,9 +38,10 @@ public class MainFrame extends Frame
   private int backgroundSizeOfHeight = 672;
   private Hero hero;
   private static int FPS = 60;
-  private int walkSpeed = 10;
+  private int walkSpeed = 1;
   private GrassLand[] grassLands = new GrassLand[41];
   private Random random = new Random();
+  //提供了与本地平台和 GUI 系统交互的工具。通过 Toolkit，可以访问一些与操作系统相关的资源和服务，比如图像加载、字体信息、屏幕尺寸、系统剪贴板等
   Toolkit toolkit = Toolkit.getDefaultToolkit();
   Dimension screenSize = this.toolkit.getScreenSize();
   List<Bullet> heroBullets;
@@ -50,7 +51,7 @@ public class MainFrame extends Frame
   private boolean upDown = false;
   private boolean downDown = false;
   private boolean jumpDown = false;
-  private int heroNum = 1;
+  private int heroNum = 5;
   private List<SimpleEnemy> enemys = new ArrayList();
   private boolean showBossScene = false;
   private Boss boss;
@@ -98,7 +99,7 @@ public class MainFrame extends Frame
     initGrassLands();
     initEnemys();
     setSize(this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
-    setLocation((this.screenSize.width - getWidth()) / 2, 20);
+    setLocation((this.screenSize.width - getWidth()) / 2, 100);
     setVisible(false);
     setResizable(false);
     this.addComponentListener(new ComponentAdapter() {
@@ -276,9 +277,9 @@ public class MainFrame extends Frame
      g.setColor(Color.black);
      g.fillRect(0, 0, this.backgroundSizeOfWidth, this.backgroundSizeOfHeight);
      g.setColor(Color.white);
-     g.setFont(new Font(null, 1, 30));
+     g.setFont(new Font("楷体", Font.BOLD, 30));
      g.drawString("温馨提示", 740, 100);
-     g.setFont(new Font(null, 1, 20));
+     g.setFont(new Font("楷体", Font.BOLD, 20));
      g.drawString("按esc可以", 740, 150);
      g.drawString("暂停并查看", 740, 180);
      g.drawString("操作控制", 740, 210);
@@ -418,10 +419,15 @@ public class MainFrame extends Frame
     drawEnemyBullets(this.big);
     g2.setColor(Color.black);
     g2.fillRect(0, 0, getWidth(), getHeight());
+    this.big.setColor(new Color(110, 60, 0));
+    this.big.setFont(new Font("Championship", 0, 30));
+    this.big.drawString("LIFE: "+this.heroNum, 10, 30);
+    this.big.drawString("SCORE: "+score,740,30);
+//    this.big.drawString("TIME: "+timer.getElapsedTimeFormatted(), 740, 60);
     g.setColor(Color.white);
-    g.setFont(new Font(null, 1, 30));
+    g.setFont(new Font("楷体", Font.BOLD, 30));
     g.drawString("温馨提示", 740, 100);
-    g.setFont(new Font(null, 1, 20));
+    g.setFont(new Font("楷体", Font.BOLD, 20));
     g.drawString("按esc可以", 740, 150);
     g.drawString("暂停并查看", 740, 180);
     g.drawString("操作控制", 740, 210);
@@ -554,6 +560,7 @@ public class MainFrame extends Frame
 
          if ((this.hero.state == 5) && (this.heroNum > 0)) {
            heroBirth();
+           this.heroNum -= 1;
          }
 
          if (this.heroNum <= 0) {
@@ -726,7 +733,6 @@ public class MainFrame extends Frame
        this.hero = new Hero(findBirthPlace(), finBirthDirection());
      }
      this.hero.state = 0;
-     this.heroNum = 100;
      this.leftDown = false;
      this.rightDown = false;
      this.upDown = false;
